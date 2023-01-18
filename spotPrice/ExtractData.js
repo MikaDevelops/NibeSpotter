@@ -32,7 +32,7 @@ function extractData(json){
 
     // Last sundays for daylight saving (march and october)
     const marchLastSunday = getLastSunday ( currentDate.getFullYear(), 3 );
-    const octoberLastSunday = getLastSundayMarch ( currentDate.getFullYear(), 10 );
+    const octoberLastSunday = getLastSunday ( currentDate.getFullYear(), 10 );
 
     const nextDayDate = getTomorrow( currentDate );
     const day = nextDayDate.getDate();
@@ -57,6 +57,7 @@ function extractData(json){
 
         // Get row index for current day and time
         let rowIndex = ( json.data.Rows.findIndex( (element)=> element.StartTime == dateTimeString ) );
+        if ( rowIndex < 0 ) break;
 
         // Get column index for current day
         let columnIndex = ( json.data.Rows[rowIndex].Columns.findIndex( (element)=> element.Name == dateString ) );
