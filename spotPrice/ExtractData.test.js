@@ -1,4 +1,4 @@
-const extractData = require('./ExtractData');
+const {extractData} = require('./ExtractData.js');
 
 test('extract data test', ()=> {
     

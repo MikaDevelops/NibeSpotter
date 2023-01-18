@@ -1,4 +1,4 @@
-export default function extractData(json){
+function extractData(json){
 
     /* ******************** DateTime related functions ******************** */
     
@@ -114,3 +114,4 @@ export default function extractData(json){
 
     }
 }
+module.exports={extractData}
