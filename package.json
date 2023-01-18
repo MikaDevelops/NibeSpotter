@@ -1,0 +1,30 @@
+{
+  "name": "nibespotter",
+  "version": "1.0.0",
+  "description": "Spot the spot price for nibe to use.",
+  "main": "App.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MikaDevelops/NibeSpotter.git"
+  },
+  "keywords": [
+    "nordpool",
+    "nibe",
+    "spot-price"
+  ],
+  "author": "MikaDevelops",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/MikaDevelops/NibeSpotter/issues"
+  },
+  "homepage": "https://github.com/MikaDevelops/NibeSpotter#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "jest": "^29.3.1"
+  }
+}
