@@ -16,7 +16,7 @@ function extractData(json){
         return tomorrow;
     }
 
-    // Month number 1-12 with leading zero from month index
+    // Returns month number 1-12 with leading zero from month index
     const getMonthWithLeadZero = ()=> {
         let monthZero = "0";
         let month = nextDayDate.getMonth() + 1;
