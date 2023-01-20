@@ -2,17 +2,16 @@ function extractData(json){
 
     /* ******************** DateTime related functions ******************** */
     
-    // Returns last sunday of month (1AM UTC). Month parameter 1-12.
+    // Returns last sunday of month (00:00 UTC). Month parameter 1-12.
     const getLastSunday = ( year, month )=> {
-        let date = new Date( year + "-" + month + "-31T01:00:00.000Z" );
+        let date = new Date( year + "-" + month + "-31T00:00:00.000Z" );
         let lastSunday = new Date (date.setDate(date.getDate()-date.getDay()));
         return lastSunday;
     }
 
     // Get the date for tomorrow.
     const getTomorrow = ( current )=> {
-        let tomorrow = new Date(current);
-        tomorrow.setDate( tomorrow.getDate() + 1 );
+        let tomorrow = new Date( current.valueOf() + 86400000 );
         return tomorrow;
     }
 
@@ -31,7 +30,8 @@ function extractData(json){
     const currentDate = new Date();
 
     // Last sundays for daylight saving (march and october)
-    const marchLastSunday = getLastSunday ( currentDate.getFullYear(), 3 );
+    const marchLastSunday = getLastSunday ( currentDate.getFullYear(), "03" );
+
     const octoberLastSunday = getLastSunday ( currentDate.getFullYear(), 10 );
 
     const nextDayDate = getTomorrow( currentDate );
@@ -62,57 +62,62 @@ function extractData(json){
         // Get column index for current day
         let columnIndex = ( json.data.Rows[rowIndex].Columns.findIndex( (element)=> element.Name == dateString ) );
 
-        // Put data to object
+        // Put data to array
         // We want start time, end time, and price. First we get the start time.
 
-        // // subtract hours from date
-        // const subtractHours = (date, hoursToSubtract)=> {
-        //     let result = new Date( date );
-        //     result.setHours(result.getHours()-hoursToSubtract);
-        //     return result;
-        // }
+        let timezoneOffsetNordPool;
+        let nordPoolDateTimeStart;
+        let nordPoolDateTimeEnd;
 
-        // It's summertime
-        if ( nextDayDate.setHours(3,0,0,0).valueOf() >= marchLastSunday.valueOf() 
-        && nextDayDate.setHours(3,0,0,0).valueOf() < octoberLastSunday.valueOf() ){
+        if( nextDayDate.setUTCHours(0,0,0,0).valueOf() < marchLastSunday.valueOf()){
+            
+            timezoneOffsetNordPool = '+01:00';
 
-        }
-        
-        // day of turning clock backwards at 0200 CET on last Sunday of October
-        if (nextDayDate.getDate() == octoberLastSunday.getDate() 
-            && nextDayDate.getMonth() == octoberLastSunday.getMonth() 
-            && i == 2
-            && rowIndex != -1)
-            {
-                const dataFirstHour = [];
-                const dataSecondHour = [];
+        }else if(nextDayDate.setUTCHours(0,0,0,0).valueOf() > marchLastSunday.valueOf()
+        && nextDayDate.setUTCHours(0,0,0,0).valueOf() < octoberLastSunday.valueOf()){
 
-                let nordPoolDateTimeStart = new Date( json.data.Rows[rowIndex].StartTime + "+01:00" );
-                let nordPoolDateTimeEnd = new Date( json.data.Rows[rowIndex].EndTime + "+01:00" );
-                dataFirstHour.push( nordPoolDateTimeStart.toISOString() );
-                dataFirstHour.push( nordPoolDateTimeEnd.toISOString()  );
-                dataFirstHour.push( json.data.Rows[rowIndex].Columns[columnIndex].Value );
+            timezoneOffsetNordPool = '+02:00';
 
-                
-                if (json.data.Rows[ rowIndex + 1 ].StartTime == dateTimeString){
-                    let nordPoolDateTimeStartExtra = ( new Date( json.data.Rows[rowIndex + 1 ].StartTime ) );
-                    let nordPoolDateTimeEndExtra = new Date( json.data.Rows[rowIndex + 1 ].EndTime );
-                    dataSecondHour.push( subtractHours( nordPoolDateTimeStartExtra, 1 ) );
-                    dataSecondHour.push( subtractHours( nordPoolDateTimeEndExtra, 1 ) );
-                    dataSecondHour.push( json.data.Rows[rowIndex + 1].Columns[columnIndex].Value );
-                }
+        }else if(nextDayDate.setUTCHours(0,0,0,0).valueOf() == marchLastSunday.valueOf() && i > 1){
 
-                priceData.push( dataFirstHour );
-                priceData.push( dataSecondHour );
-        
-        // If next day is last day of 
-        } else if ( nextDayDate.getDate() == marchLastSunday.getDate() 
-            && nextDayDate.getMonth() == marchLastSunday.getMonth()
+            timezoneOffsetNordPool = '+02:00';
 
-        ){
+        }else if(nextDayDate.setUTCHours(0,0,0,0).valueOf() == marchLastSunday.valueOf() && i < 2){
+
+            timezoneOffsetNordPool = '+01:00';
+
+        }else if(nextDayDate.setUTCHours(0,0,0,0).valueOf() == octoberLastSunday.valueOf() && i > 2){
+
+            timezoneOffsetNordPool = '+01:00';
+
+        }else if(nextDayDate.setUTCHours(0,0,0,0).valueOf() == octoberLastSunday.valueOf() && i < 3){
+
+            timezoneOffsetNordPool = '+02:00';
+
+        }else if( nextDayDate.setUTCHours(0,0,0,0).valueOf() > marchLastSunday.valueOf()
+                    && nextDayDate.setUTCHours(0,0,0,0).valueOf() < octoberLastSunday.valueOf()){
+
+            timezoneOffsetNordPool = '+02:00';
 
         }
 
+        nordPoolDateTimeStart = new Date( json.data.Rows[rowIndex].StartTime + timezoneOffsetNordPool );
+        nordPoolDateTimeEnd = new Date( json.data.Rows[rowIndex].EndTime + timezoneOffsetNordPool );
+
+        priceData.push( nordPoolDateTimeStart.toISOString() );
+        priceData.push( nordPoolDateTimeEnd.toISOString()  );
+        priceData.push( json.data.Rows[rowIndex].Columns[columnIndex].Value.replace(",", ".") );
+
+        if (i == 2 && json.data.Rows[ rowIndex + 1 ].StartTime == dateTimeString){
+            let nordPoolDateTimeStartExtra = ( new Date( json.data.Rows[rowIndex + 1 ].StartTime + "+01:00" ) );
+            let nordPoolDateTimeEndExtra = new Date( json.data.Rows[rowIndex + 1 ].EndTime + "+01:00" );
+            priceData.push( nordPoolDateTimeStartExtra );
+            priceData.push( nordPoolDateTimeEndExtra );
+            priceData.push( json.data.Rows[rowIndex + 1].Columns[columnIndex].Value.replace(",", ".") );
+        }
+            
     }
+    
+    return priceData;
 }
 module.exports={extractData}
