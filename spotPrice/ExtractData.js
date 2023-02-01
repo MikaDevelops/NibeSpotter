@@ -1,13 +1,15 @@
+const { getLastSunday } = require("./DateTimeFunctions.js");
+
 function extractData(json){
 
     /* ******************** DateTime related functions ******************** */
     
     // Returns last sunday of month (00:00 UTC). Month parameter 1-12.
-    const getLastSunday = ( year, month )=> {
+   /*  const getLastSunday = ( year, month )=> {
         let date = new Date( year + "-" + month + "-31T00:00:00.000Z" );
         let lastSunday = new Date (date.setDate(date.getDate()-date.getDay()));
         return lastSunday;
-    }
+    } */
 
     // Get the date for tomorrow.
     const getTomorrow = ( current )=> {
