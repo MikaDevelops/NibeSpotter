@@ -1,6 +1,6 @@
 /** DateTime related functions */
 
-const getLastSunday = (year, month) => {
+function getLastSunday ( year, month ) {
 
     let date = new Date( year + "-" + month + "-31T00:00:00.000Z" );
     let lastSunday = new Date (date.setDate(date.getDate()-date.getDay()));
@@ -15,4 +15,9 @@ const getLastSunday = (year, month) => {
 
 }
 
-module.exports = {getLastSunday}
+function getTomorrow ( current ) {
+    let tomorrow = new Date( current.valueOf() + 86400000 );
+    return tomorrow;
+}
+
+module.exports = {getLastSunday, getTomorrow}
