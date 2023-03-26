@@ -20,6 +20,11 @@ function getTomorrow ( current ) {
     return tomorrow;
 }
 
+/**
+ * Adds one to month index and leading zero if month is before october (under 10).
+ * @param {*} date Date object to get the month index
+ * @returns month number, either string if lead zero or number
+ */
 function getMonthWithLeadZero (date) {
     let monthZero = "0";
     let month = date.getMonth() + 1;
