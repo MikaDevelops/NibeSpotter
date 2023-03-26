@@ -1,5 +1,5 @@
-const { getLastSunday } = require( './DateTimeFunctions.js');
-//const { getTomorrow } = require('./DateTimeFunctions.js');
+const { getLastSunday, getTomorrow, getMonthWithLeadZero } = require( './DateTimeFunctions.js');
+
 
 test('DateTimeFunction getLastSunday test',()=>{
     
@@ -24,7 +24,7 @@ test('DateTimeFunction getLastSunday test',()=>{
 
 test('DateTimeFunction getTomorrow test', ()=>{
 
-    const { getTomorrow } = require('./DateTimeFunctions');
+
 
     let testData = [
         new Date('2023-03-01T12:30:00.000'),
@@ -38,5 +38,26 @@ test('DateTimeFunction getTomorrow test', ()=>{
 
     expect(getTomorrow(testData[0])).toEqual(expectedDates[0]);
     expect(getTomorrow(testData[1])).toEqual(expectedDates[1]);
+
+});
+
+test('DateTimeFunction getMonthWithLeadZero test', ()=>{
+
+    // Month num. 1, 9, 10 (indexes 0, 8, 9)
+    let testData = [
+        new Date('2023-01-01'),
+        new Date('2023-09-01'),
+        new Date('2023-10-01'),
+    ];
+
+    let expectedData =[
+        '01',
+        '09',
+        '10'
+    ];
+
+    expect(getMonthWithLeadZero(testData[0])).toEqual(expectedData[0]);
+    expect(getMonthWithLeadZero(testData[1])).toEqual(expectedData[1]);
+    expect(getMonthWithLeadZero(testData[2])).toEqual(expectedData[2]);
 
 });
