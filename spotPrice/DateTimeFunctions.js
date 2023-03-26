@@ -1,5 +1,11 @@
 /** DateTime related functions */
 
+/**
+ * Returns a Date object with date set to last Sunday of the given month.
+ * @param {*} year number or string to be used as year.
+ * @param {*} month should be string if leading zero needed
+ * @returns Date object with the last Sunday set as date.
+ */
 function getLastSunday ( year, month ) {
 
     let date = new Date( year + "-" + month + "-31T00:00:00.000Z" );
@@ -15,6 +21,11 @@ function getLastSunday ( year, month ) {
 
 }
 
+/**
+ * Adds 24 hours to given Date object and returns object.
+ * @param {Date} current Date object
+ * @returns 
+ */
 function getTomorrow ( current ) {
     let tomorrow = new Date( current.valueOf() + 86400000 );
     return tomorrow;
