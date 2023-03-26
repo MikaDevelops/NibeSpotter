@@ -24,7 +24,7 @@ function getLastSunday ( year, month ) {
 /**
  * Adds 24 hours to given Date object and returns object.
  * @param {Date} current Date object
- * @returns 
+ * @returns 24 hours added Date object
  */
 function getTomorrow ( current ) {
     let tomorrow = new Date( current.valueOf() + 86400000 );
