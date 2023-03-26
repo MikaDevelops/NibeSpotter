@@ -1,34 +1,6 @@
 const { getLastSunday, getTomorrow, getMonthWithLeadZero } = require("./DateTimeFunctions.js");
-// const { getTomorrow } = require("./DateTimeFunctions.js");
 
 function extractData(json){
-
-    /* ******************** DateTime related functions ******************** */
-    
-    // Returns last sunday of month (00:00 UTC). Month parameter 1-12.
-   /*  const getLastSunday = ( year, month )=> {
-        let date = new Date( year + "-" + month + "-31T00:00:00.000Z" );
-        let lastSunday = new Date (date.setDate(date.getDate()-date.getDay()));
-        return lastSunday;
-    } */
-
-    // Get the date for tomorrow.
-    /*const getTomorrow = ( current )=> {
-        let tomorrow = new Date( current.valueOf() + 86400000 );
-        return tomorrow;
-    }*/
-
-    /* Returns month number 1-12 with leading zero from month index
-    const getMonthWithLeadZero = ()=> {
-        let monthZero = "0";
-        let month = nextDayDate.getMonth() + 1;
-        if (month > 9) { 
-            return month;
-         } else {
-            return monthZero + month;
-         }
-    }
-    /* ******************************************************************** */
 
     const currentDate = new Date();
 
