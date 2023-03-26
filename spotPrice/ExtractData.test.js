@@ -2,8 +2,6 @@ const {extractData} = require('./ExtractData.js');
 const {mockData} = require('./__mocks__/mockData.js');
 
 test('extract data test', ()=> {
-    
-    
 
     let MockDate = require('mockdate');
 

@@ -20,4 +20,14 @@ function getTomorrow ( current ) {
     return tomorrow;
 }
 
-module.exports = {getLastSunday, getTomorrow}
+function getMonthWithLeadZero (date) {
+    let monthZero = "0";
+    let month = date.getMonth() + 1;
+    if (month > 9) { 
+        return month;
+     } else {
+        return monthZero + month;
+     }
+}
+
+module.exports = {getLastSunday, getTomorrow, getMonthWithLeadZero}

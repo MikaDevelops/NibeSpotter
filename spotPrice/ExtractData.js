@@ -1,4 +1,5 @@
-const { getLastSunday } = require("./DateTimeFunctions.js");
+const { getLastSunday, getTomorrow, getMonthWithLeadZero } = require("./DateTimeFunctions.js");
+// const { getTomorrow } = require("./DateTimeFunctions.js");
 
 function extractData(json){
 
@@ -12,12 +13,12 @@ function extractData(json){
     } */
 
     // Get the date for tomorrow.
-    const getTomorrow = ( current )=> {
+    /*const getTomorrow = ( current )=> {
         let tomorrow = new Date( current.valueOf() + 86400000 );
         return tomorrow;
-    }
+    }*/
 
-    // Returns month number 1-12 with leading zero from month index
+    /* Returns month number 1-12 with leading zero from month index
     const getMonthWithLeadZero = ()=> {
         let monthZero = "0";
         let month = nextDayDate.getMonth() + 1;
@@ -38,7 +39,7 @@ function extractData(json){
 
     const nextDayDate = getTomorrow( currentDate );
     const day = nextDayDate.getDate();
-    const month = getMonthWithLeadZero();
+    const month = getMonthWithLeadZero(nextDayDate);
     const year = nextDayDate.getFullYear();
 
     // Object for data
