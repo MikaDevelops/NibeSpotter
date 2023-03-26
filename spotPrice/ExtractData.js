@@ -76,6 +76,7 @@ function extractData(json){
 
         }
 
+        // 
         nordPoolDateTimeStart = new Date( json.data.Rows[rowIndex].StartTime + timezoneOffsetNordPool );
         nordPoolDateTimeEnd = new Date( json.data.Rows[rowIndex].EndTime + timezoneOffsetNordPool );
 
