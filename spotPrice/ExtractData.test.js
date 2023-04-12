@@ -19,14 +19,15 @@ test('extract data test 11th January 2023', ()=> {
 });
 
 
-test('extract data test 26th March 2023', ()=> {
+test('extract data test 26th March 2023 daylight saving kicks in', ()=> {
 
     let MockDate = require('mockdate');
 
     // 25th March 2023 14:00
     MockDate.set(1679745600000);
     console.log(extractData(mockDataDayLightMarch));
-    // TODO: update expected from mockupDataDayLightMarch.js
+
+    // TODO: figure out what ExtractData should output
     let expectedData = [
         "2023-03-25T23:00:00.000Z","2023-03-26T00:00:00.000Z","39.66",
         "2023-03-26T00:00:00.000Z","2023-03-26T01:00:00.000Z","39.23",
