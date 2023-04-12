@@ -1,5 +1,6 @@
 const {extractData} = require('./ExtractData.js');
 const {mockData} = require('./__mocks__/mockData.js');
+const {mockDataDLMarch} = require('./__mocks__/mockDataDayLightMarch.js');
 
 test('extract data test', ()=> {
 
