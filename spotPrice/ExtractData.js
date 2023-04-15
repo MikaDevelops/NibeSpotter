@@ -69,14 +69,14 @@ function extractData(json){
         priceData.push( nordPoolDateTimeEnd.toISOString()  );
         priceData.push( json.data.Rows[rowIndex].Columns[columnIndex].Value.replace(",", ".") );
 
-        // 
-        // if (i == 2 && json.data.Rows[ rowIndex + 1 ].StartTime == dateTimeString){
-        //     let nordPoolDateTimeStartExtra = ( new Date( json.data.Rows[rowIndex + 1 ].StartTime + "+01:00" ) );
-        //     let nordPoolDateTimeEndExtra = new Date( json.data.Rows[rowIndex + 1 ].EndTime + "+01:00" );
-        //     priceData.push( nordPoolDateTimeStartExtra );
-        //     priceData.push( nordPoolDateTimeEndExtra );
-        //     priceData.push( json.data.Rows[rowIndex + 1].Columns[columnIndex].Value.replace(",", ".") );
-        // }
+        // if it is last sunday of October and time is 02:00 we get the exra row.
+        if (i == 2 && json.data.Rows[ rowIndex + 1 ].StartTime == dateTimeString){
+            let nordPoolDateTimeStartExtra = ( new Date( json.data.Rows[rowIndex + 1 ].StartTime + "+01:00" ) );
+            let nordPoolDateTimeEndExtra = new Date( json.data.Rows[rowIndex + 1 ].EndTime + "+01:00" );
+            priceData.push( nordPoolDateTimeStartExtra.toISOString() );
+            priceData.push( nordPoolDateTimeEndExtra.toISOString() );
+            priceData.push( json.data.Rows[rowIndex + 1].Columns[columnIndex].Value.replace(",", ".") );
+        }
             
     }
     

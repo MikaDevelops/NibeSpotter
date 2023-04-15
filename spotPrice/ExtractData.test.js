@@ -1,9 +1,10 @@
 const {extractData} = require('./ExtractData.js');
 const {mockData} = require('./__mocks__/mockData.js');
 const {mockDataDayLightMarch} = require('./__mocks__/mockDataDayLightMarch.js');
+const {mockDataDayLightOctober} = require('./__mocks__/mockDataDayLightOct.js');
 
 
-test('extract data test 11th January 2023', ()=> {
+test('extract data test 11th January 2023 15:00 EET', ()=> {
 
     let MockDate = require('mockdate');
 
@@ -47,11 +48,9 @@ test('extract data test 26th March 2023 daylight saving kicks in', ()=> {
 
     let MockDate = require('mockdate');
 
-    // 25th March 2023 14:00
+    // 25th March 2023 14:00 EET
     MockDate.set(1679745600000);
-    console.log(extractData(mockDataDayLightMarch));
-
-    // TODO: figure out what ExtractData should output
+   
     let expectedData = [
         "2023-03-25T23:00:00.000Z","2023-03-26T00:00:00.000Z","39.66",
         "2023-03-26T00:00:00.000Z","2023-03-26T01:00:00.000Z","39.23",
@@ -79,6 +78,47 @@ test('extract data test 26th March 2023 daylight saving kicks in', ()=> {
     ] 
 
     expect (extractData(mockDataDayLightMarch)).toEqual(expectedData);
+
+
+    MockDate.reset();
+
+});
+
+test('extract data test 29th March 2023 daylight saving kicks out', ()=> {
+
+    let MockDate = require('mockdate');
+
+    // 28th March 2023 14:00 EEST
+    MockDate.set(1698490800000);
+
+    let expectedData = [
+        '2023-10-28T22:00:00.000Z', '2023-10-28T23:00:00.000Z', '39.66',
+        '2023-10-28T23:00:00.000Z', '2023-10-29T00:00:00.000Z', '39.23',
+        '2023-10-29T00:00:00.000Z', '2023-10-29T01:00:00.000Z', '1.00',
+        '2023-10-29T01:00:00.000Z', '2023-10-29T02:00:00.000Z', '2.00',
+        '2023-10-29T02:00:00.000Z', '2023-10-29T03:00:00.000Z', '40.12',
+        '2023-10-29T03:00:00.000Z', '2023-10-29T04:00:00.000Z', '40.88',
+        '2023-10-29T04:00:00.000Z', '2023-10-29T05:00:00.000Z', '40.43',
+        '2023-10-29T05:00:00.000Z', '2023-10-29T06:00:00.000Z', '41.00',
+        '2023-10-29T06:00:00.000Z', '2023-10-29T07:00:00.000Z', '41.75',
+        '2023-10-29T07:00:00.000Z', '2023-10-29T08:00:00.000Z', '43.39',
+        '2023-10-29T08:00:00.000Z', '2023-10-29T09:00:00.000Z', '47.66',
+        '2023-10-29T09:00:00.000Z', '2023-10-29T10:00:00.000Z', '49.62',
+        '2023-10-29T10:00:00.000Z', '2023-10-29T11:00:00.000Z', '50.01',
+        '2023-10-29T11:00:00.000Z', '2023-10-29T12:00:00.000Z', '46.37',
+        '2023-10-29T12:00:00.000Z', '2023-10-29T13:00:00.000Z', '43.30',
+        '2023-10-29T13:00:00.000Z', '2023-10-29T14:00:00.000Z', '44.25',
+        '2023-10-29T14:00:00.000Z', '2023-10-29T15:00:00.000Z', '43.08',
+        '2023-10-29T15:00:00.000Z', '2023-10-29T16:00:00.000Z', '48.35',
+        '2023-10-29T16:00:00.000Z', '2023-10-29T17:00:00.000Z', '62.37',
+        '2023-10-29T17:00:00.000Z', '2023-10-29T18:00:00.000Z', '61.98',
+        '2023-10-29T18:00:00.000Z', '2023-10-29T19:00:00.000Z', '54.84',
+        '2023-10-29T19:00:00.000Z', '2023-10-29T20:00:00.000Z', '45.58',
+        '2023-10-29T20:00:00.000Z', '2023-10-29T21:00:00.000Z', '44.18',
+        '2023-10-29T21:00:00.000Z', '2023-10-29T22:00:00.000Z', '40.87',
+        '2023-10-29T22:00:00.000Z', '2023-03-26T23:00:00.000Z', '39.11'
+    ] 
+    expect (extractData(mockDataDayLightOctober)).toEqual(expectedData);
 
 
     MockDate.reset();
