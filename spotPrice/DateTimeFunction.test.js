@@ -1,4 +1,4 @@
-const { getLastSunday, getTomorrow, getMonthWithLeadZero } = require( './DateTimeFunctions.js');
+const { getLastSunday, getTomorrow, getMonthWithLeadZero, isSummertime } = require( './DateTimeFunctions.js');
 
 
 test('DateTimeFunction getLastSunday test',()=>{
@@ -59,5 +59,33 @@ test('DateTimeFunction getMonthWithLeadZero test', ()=>{
     expect(getMonthWithLeadZero(testData[0])).toEqual(expectedData[0]);
     expect(getMonthWithLeadZero(testData[1])).toEqual(expectedData[1]);
     expect(getMonthWithLeadZero(testData[2])).toEqual(expectedData[2]);
+
+});
+
+test('DateTimeFunction isSummerTime test', ()=>{
+
+    let testData = [
+        '2023-03-26T01:59:59.000Z',
+        '2023-03-26T02:this should not stop function from working',
+        '2023-03-29T02:59:59',
+        '2023-03-29T03:00:00',
+
+
+    ];
+
+    let expectedData =[
+
+        false,
+        true,
+        true,
+        false,
+
+    ];
+
+    expect(isSummertime(testData[0])).toBe(expectedData[0]);
+    expect(isSummertime(testData[1])).toBe(expectedData[1]);
+    expect(isSummertime(testData[2])).toBe(expectedData[2]);
+    expect(isSummertime(testData[3])).toBe(expectedData[3]);
+
 
 });
