@@ -49,7 +49,7 @@ function getMonthWithLeadZero (date) {
 }
 
 /**
- * Checks date string is in summertime period.
+ * Checks if date string is in summertime period.
  * @param {string} dateString string to be checked (YYYY-MM-DDT00:00:00)
  * @returns boolean
  */
