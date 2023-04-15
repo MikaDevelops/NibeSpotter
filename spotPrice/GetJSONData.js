@@ -3,6 +3,7 @@ export default function getData(){
 
     fetch( apiUrl )
     .then ( ( response )=> { return response.json(); } )
+    .catch( err=> { console.log(err) })
 
 } 
 

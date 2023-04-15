@@ -48,4 +48,31 @@ function getMonthWithLeadZero (date) {
      }
 }
 
-module.exports = {getLastSunday, getTomorrow, getMonthWithLeadZero}
+/**
+ * Checks if date string is in summertime period.
+ * @param {string} dateString string to be checked (YYYY-MM-DDT00:00:00)
+ * @returns boolean
+ */
+function isSummertime(dateString){
+
+    const date = dateString.split('T')[0].split('-');
+    const time = dateString.split('T')[1].split(':');
+
+    // get the last sundays of march and october for the year
+    const marchLastSunday = getLastSunday(date[0], '03');
+    const octoberLastSunday = getLastSunday(date[0], '10');
+
+    // to ease thing out lets make comparison numbers
+    const dateNum = Number( dateString.split('T')[0].split('-')[0] 
+        + dateString.split('T')[0].split('-')[1] 
+        + dateString.split('T')[0].split('-')[2]
+        + dateString.split('T')[1].split(':')[0] );
+    const marchNum =  Number(date[0].toString()+ date[1].toString() + marchLastSunday.getDate().toString()+'02') ;
+    const octoberNum =  Number(date[0].toString()+ date[1].toString() + octoberLastSunday.getDate().toString()+'03');
+
+    // compare if date string is in between march last sun. 02:00 and oct last sun 02:59:59
+    if ( dateNum >= marchNum && dateNum < octoberNum ) return true; 
+    return false;
+}
+
+module.exports = {getLastSunday, getTomorrow, getMonthWithLeadZero, isSummertime}
