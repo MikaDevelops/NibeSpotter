@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const maria = require('mariadb');
 const pool = maria.createPool({
     host: process.env.DB_HOST,
@@ -7,20 +5,21 @@ const pool = maria.createPool({
     connectionLimit: 10
 });
 
-/*async*/ function connect(){
-   console.log(process.env.DB_HOST);
-    // let connection;
-    // try {
+async function connect(){
+
+
+    let connection;
+    try {
         
-    //     connection = await pool.getConnection();
+        connection = await pool.getConnection();
 
-    // } catch (error) {
+    } catch (error) {
 
-    //     console.error(error);
+        console.error(error);
 
-    // } finally {
-    //     if (connection) connection.release();
-    // }
+    } finally {
+        if (connection) connection.release();
+    }
 
 }
 

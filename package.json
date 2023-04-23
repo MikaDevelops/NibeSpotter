@@ -4,6 +4,7 @@
   "description": "Spot the spot price for nibe to use.",
   "main": "App.js",
   "scripts": {
+    "start":"node App.js",
     "test": "jest"
   },
   "repository": {
