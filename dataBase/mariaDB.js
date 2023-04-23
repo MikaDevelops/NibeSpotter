@@ -5,22 +5,23 @@ const pool = maria.createPool({
     connectionLimit: 10
 });
 
-async function connect(){
-
+async function connectToDatabase(){
 
     let connection;
     try {
         
         connection = await pool.getConnection();
+        return connection;
 
     } catch (error) {
-
         console.error(error);
+    } 
+}
 
-    } finally {
-        if (connection) connection.release();
-    }
+async function closeConnection(connection){
+
+    if(connection) { await connection.release();}
 
 }
 
-module.exports={connect}
+module.exports={connectToDatabase, closeConnection}
