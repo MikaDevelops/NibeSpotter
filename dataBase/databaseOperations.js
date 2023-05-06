@@ -1,30 +1,44 @@
-const {connectToDatabase, closeConnection} = require('./mariaDB.js');
+const {connectToDatabase} = require('./mariaDB.js');
 const {spotDataModel} = require('./dataModel.js');
 
-async function saveSpotData(data){
+/**
+ * Inserts data to database.
+ * @param {string[]} data - array of price data
+ */
+function saveSpotData(data){
 
-        connectToDatabase()
-            .then( connection=>{
+   connectToDatabase()
+   .then((conn)=>{
 
-            const priceData = batchData(data);
+        // Modify pricedata for batch insert
+        const priceData = batchData(data);
 
-            let sqlString = 
-            `INSERT INTO ${spotDataModel.tableName} (${spotDataModel.idField},
-            ${spotDataModel.dataFields[0]}, ${spotDataModel.dataFields[1]} , ${spotDataModel.dataFields[2]}
-            ) VALUES (?, ?, ?, "FI")`; // TODO: pricearea from spot-data
+        // SQL string for batch insert
+        let sqlString = 
+        `INSERT INTO ${spotDataModel.tableName} (${spotDataModel.idField},
+        ${spotDataModel.dataFields[0]}, ${spotDataModel.dataFields[1]} , ${spotDataModel.dataFields[2]}
+        ) VALUES (?, ?, ?, "FI")`; // TODO: pricearea from spot-data
 
-            connection.batch(sqlString, priceData).then((res)=>{
 
+        conn.batch(sqlString, priceData)
+            .then((res)=> {
+                conn.end();
                 console.log(res);
-                connection.release();
-               
+            })
+            .catch(error=> {
+                conn.end();
+                console.error(error);   
+            });
 
-            }).catch(error =>{ console.log("first error: "+error); connection.release(); });
+    }).catch((error)=>{console.error(error)});
 
-        }).catch((error)=>{ console.log("outer error: "+error);})
-    
 }
 
+/**
+ * Makes array of price data sequence into bachable array.
+ * @param {string[]} data - array of price data to be modified
+ * @returns array with arrays of hourly price data
+ */
 function batchData(data){
     if (data.length%3 == 0){
 

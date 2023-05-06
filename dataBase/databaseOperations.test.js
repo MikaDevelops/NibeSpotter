@@ -9,13 +9,10 @@ let dataset = ['2000-01-02T16:00:00','2000-01-02T17:00:00','6.66',
 
 // test('database test', ()=> {
 
-    saveSpotData(dataset)
-    
-        .then((res)=>{
-            console.log("test, results:   "+res);
-        })
-        .catch(error=>{console.error("from saveSpotData: "+error)});
-    
+saveSpotData(dataset);
+
+
+
 
 // });
 
