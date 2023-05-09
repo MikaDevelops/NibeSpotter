@@ -11,7 +11,7 @@ JavaScript, SQL (MariaDB), React, Jest
 ## Project status
 
 - [x] extracting data from Json
-- [ ] saving extracted data to database
+- [x] saving extracted data to database
 - [ ] authentication to Nibeuplink-service
 - [ ] front-end user interface
 - [ ] authentication to front-end services
