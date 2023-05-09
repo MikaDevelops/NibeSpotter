@@ -1,4 +1,3 @@
-
 const maria = require('mariadb');
 
 async function connectToDatabase(){
@@ -18,11 +17,9 @@ async function connectToDatabase(){
 
     } catch (error) {
 
-        console.error("*********\nconnectToDataBase catch block\ngetting connection  failed\n*********\n"+error);
+        console.error(error);
         
     } 
 }
-
-
 
 module.exports={connectToDatabase}
