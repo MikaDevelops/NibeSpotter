@@ -5,6 +5,7 @@ const app     = express();
 const fs      = require('fs');
 const path    = require('path');
 const https   = require('node:https');
+const axios   = require('axios');
 
 const states  = {};
 
@@ -30,27 +31,58 @@ app.get('/nibe', (req, res)=>{
   console.log("code: "+authorizationCode + "\nstate: " + responseState);
 
   const options = {
-    hostname:   'api.nibeuplink.com',
-    path:       '/oauth/token?grant_type=authorization_code&client_id='+process.env.NIBE_CLIENT_ID+'&client_secret='+process.env.NIBE_CLIENT_SECRET+'&code='+authorizationCode+'&redirect_uri=http://localhost:3000/nibe/&scope=READSYSTEM',
-    method:     'POST',
-    headers:    {
-                'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'
-                }
+    grant_type: 'authorization_code',
+    client_id: process.env.NIBE_CLIENT_ID,
+    client_secret: process.env.NIBE_CLIENT_SECRET,
+    code: authorizationCode,
+    redirect_uri: 'http://localhost:3000/nibe/',
+    scope: 'READSYSTEM'
   }
   
-  const req = https.request(options, (res)=>{
 
-    console.log('Status code:  ' + res.statusCode);
-    console.log('Headers:  ' + res.headers);
+  // const axiosInstance = axios.create({
+  //   baseURL:  'https://api.nibeuplink.com/oauth/token?grant_type=authorization_code&client_id='+process.env.NIBE_CLIENT_ID+'&client_secret='+process.env.NIBE_CLIENT_SECRET+'&code='+authorizationCode+'&redirect_uri=http://localhost:3000/nibe/&scope=READSYSTEM',
+  //   method: 'post',
+  //   headers: {'Content-Type':'application/x-www-form-urlencoded'}
+  // });
 
-  });
-
-  req.on('error', (error)=>{
-    console.error(error);
-  })
-
-  req.end();
+  axios.post(
+    'https://api.nibeuplink.com/oauth/token', options,
+    {headers: {'content-type':'application/x-www-form-urlencoded'}},
+  )
+    .then(res=>{
+      console.log('status: ', res.status);
+      console.log(res.data);
+    })
+    .catch(err=>{console.log('Error message: ' + err.message + " ")});
   
+    // fetch('https://'+options.hostname+options.path,{
+    //   method: options.method,
+    //   headers: options.headers
+    // }).then(response=>{
+    //   console.log(response.body);
+    // }).catch(err=>{console.log(err.message)});
+
+
+  // const request = https.request(options, (res)=>{
+
+  //   console.log('Status code:  ' + res.statusCode);
+  //   console.log('Headers:  ' + res.headers);
+
+  //   //let dataArray = [];
+  //   res.on('data', (data)=>{
+  //     process.stdout.write(data);
+  //   })
+
+  //   res.on('end', ()=>{ console.log('end of res');})
+    
+  // });
+
+  // request.on('error', (error)=>{
+  //   console.error(error);
+  // });
+  // request.end();
+
 });
 
 app.get('/', (req, res)=>{
