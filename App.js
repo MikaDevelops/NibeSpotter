@@ -18,7 +18,7 @@ app.use(express.json()); // parse json bodies in the request object
 /**
  * Redirect from Nibe with parameters.
  */
-app.get('/nibe', (req, res)=>{
+app.get('/nibe', (req, res2)=>{
   const authorizationCode = req.query.code;
   const responseState = req.query.state;
 
@@ -38,51 +38,24 @@ app.get('/nibe', (req, res)=>{
     redirect_uri: 'http://localhost:3000/nibe/',
     scope: 'READSYSTEM'
   }
-  
-
-  // const axiosInstance = axios.create({
-  //   baseURL:  'https://api.nibeuplink.com/oauth/token?grant_type=authorization_code&client_id='+process.env.NIBE_CLIENT_ID+'&client_secret='+process.env.NIBE_CLIENT_SECRET+'&code='+authorizationCode+'&redirect_uri=http://localhost:3000/nibe/&scope=READSYSTEM',
-  //   method: 'post',
-  //   headers: {'Content-Type':'application/x-www-form-urlencoded'}
-  // });
 
   axios.post(
     'https://api.nibeuplink.com/oauth/token', options,
     {headers: {'content-type':'application/x-www-form-urlencoded'}},
   )
     .then(res=>{
-      console.log('status: ', res.status);
-      console.log(res.data);
+      console.log('post to token status: ', res.status);
+      let token = {
+        access_token: res.data.access_token,
+        token_type: res.data.token_type,
+        expires_in: res.data.expires_in,
+        scope: res.data.scope
+      }
+      updateTokenToStates(token);
     })
     .catch(err=>{console.log('Error message: ' + err.message + " ")});
-  
-    // fetch('https://'+options.hostname+options.path,{
-    //   method: options.method,
-    //   headers: options.headers
-    // }).then(response=>{
-    //   console.log(response.body);
-    // }).catch(err=>{console.log(err.message)});
 
-
-  // const request = https.request(options, (res)=>{
-
-  //   console.log('Status code:  ' + res.statusCode);
-  //   console.log('Headers:  ' + res.headers);
-
-  //   //let dataArray = [];
-  //   res.on('data', (data)=>{
-  //     process.stdout.write(data);
-  //   })
-
-  //   res.on('end', ()=>{ console.log('end of res');})
-    
-  // });
-
-  // request.on('error', (error)=>{
-  //   console.error(error);
-  // });
-  // request.end();
-
+    res2.redirect('http://localhost:3001');
 });
 
 app.get('/', (req, res)=>{
@@ -112,3 +85,10 @@ const PORT = process.env.PORT || 3000;
 https.createServer( options, app ).listen( PORT );*/
 
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
+
+
+
+function updateTokenToStates(token){
+  states.token = token;
+  console.log(states);
+}
