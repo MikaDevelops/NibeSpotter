@@ -84,11 +84,11 @@ test('extract data test 26th March 2023 daylight saving kicks in', ()=> {
 
 });
 
-test('extract data test 29th March 2023 daylight saving kicks out', ()=> {
+test('extract data test 28th October 2023 daylight saving kicks out', ()=> {
 
     let MockDate = require('mockdate');
 
-    // 28th March 2023 14:00 EEST
+    // 28th October 2023 14:00 EEST
     MockDate.set(1698490800000);
 
     let expectedData = [
