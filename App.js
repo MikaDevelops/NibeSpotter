@@ -8,6 +8,8 @@ const https   = require('node:https');
 const axios   = require('axios');
 
 const states  = {};
+// margin seconds for token refressing.
+const refreshAdvanceSeconds = 4;
 
 // Middleware
 app.use(express.json()); // parse json bodies in the request object
@@ -86,9 +88,22 @@ https.createServer( options, app ).listen( PORT );*/
 
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
 
-
-
 function updateTokenToStates(token){
   states.token = token;
   console.log(states);
+}
+
+function refreshToken(refreshToken){
+
+  if (!Number.isInterger(refreshToken)) throw new Error ("refreshToken: Given parameter is not an integer.");
+
+  let milliseconds = (refreshToken-refreshAdvanceSeconds)*1000;
+
+  
+}
+
+function refreshTokenInterval(expirationTime){
+
+
+
 }
