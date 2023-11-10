@@ -7,9 +7,10 @@ const path    = require('path');
 const https   = require('node:https');
 const axios   = require('axios');
 
+// Object for token and others like.
 const states  = {};
-// margin seconds for token refressing.
-const refreshAdvanceSeconds = 4;
+// Margin seconds setting for token refressing.
+const refreshAdvanceSeconds = 20;
 
 // Middleware
 app.use(express.json()); // parse json bodies in the request object
@@ -30,8 +31,6 @@ app.get('/nibe', (req, res2)=>{
     process.exit(1);
   }
 
-  console.log("code: "+authorizationCode + "\nstate: " + responseState);
-
   const options = {
     grant_type: 'authorization_code',
     client_id: process.env.NIBE_CLIENT_ID,
@@ -49,11 +48,14 @@ app.get('/nibe', (req, res2)=>{
       console.log('post to token status: ', res.status);
       let token = {
         access_token: res.data.access_token,
+        refresh_token: res.data.refresh_token,
         token_type: res.data.token_type,
         expires_in: res.data.expires_in,
-        scope: res.data.scope
+        scope: res.data.scope,
+        timestamp: new Date()
       }
       updateTokenToStates(token);
+      refreshTokenInterval(parseInt(token.expires_in, 10));
     })
     .catch(err=>{console.log('Error message: ' + err.message + " ")});
 
@@ -90,20 +92,46 @@ app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
 
 function updateTokenToStates(token){
   states.token = token;
-  console.log(states);
 }
 
-function refreshToken(refreshToken){
+function refreshToken(){
 
-  if (!Number.isInterger(refreshToken)) throw new Error ("refreshToken: Given parameter is not an integer.");
+  const options = {
+    grant_type: 'refresh_token',
+    client_id: process.env.NIBE_CLIENT_ID,
+    client_secret: process.env.NIBE_CLIENT_SECRET,
+    refresh_token: states.token.refresh_token
+  }
 
-  let milliseconds = (refreshToken-refreshAdvanceSeconds)*1000;
+  axios.post(
+    'https://api.nibeuplink.com/oauth/token', options,
+    {headers: {'content-type':'application/x-www-form-urlencoded'}},
+  )
+    .then(res=>{
+      console.log('response for refresh: ', res.status);
+      
+      states.token.access_token   = res.data.access_token;
+      states.token.refresh_token  = res.data.refresh_token;
+      states.token.expires_in     = res.data.expires_in;
+      states.token.timestamp      = new Date();
+
+      refreshTokenInterval(parseInt(states.token.expires_in, 10));
+
+      console.log("refreshed token \n" + states.token.timestamp +"\n");
+
+    })
+    .catch(err=>{console.log('Error message: ' + err.message + " ")});
 
   
 }
 
 function refreshTokenInterval(expirationTime){
 
+  if (!Number.isInteger(expirationTime)) throw new Error ("refreshToken: Given parameter is not an integer.");
+  else {
 
-
+    let milliseconds = (expirationTime-refreshAdvanceSeconds)*1000;
+    setTimeout(()=>refreshToken(),milliseconds);
+  
+  }
 }
