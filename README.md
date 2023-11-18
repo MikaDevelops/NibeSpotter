@@ -6,7 +6,7 @@ Spot the spot price and give Nibe some instructions
 
 JavaScript, SQL (MariaDB), React, Jest
 
-(Some OAuth protocol based module that can authenticate application with API and cron or something like that to schedule queries. Front-end authentication to manage user access.)
+Concurrently used to start both servers with `npm start`
 
 ## Project status
 
