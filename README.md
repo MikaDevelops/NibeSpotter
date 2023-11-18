@@ -12,7 +12,7 @@ JavaScript, SQL (MariaDB), React, Jest
 
 - [x] extracting data from Json
 - [x] saving extracted data to database
-- [ ] authentication to Nibeuplink-service
+- [x] authentication to Nibeuplink-service
 - [ ] front-end user interface
 - [ ] authentication to front-end services
 
