@@ -36,7 +36,7 @@ app.get('/nibe', (req, res2)=>{
     client_id: process.env.NIBE_CLIENT_ID,
     client_secret: process.env.NIBE_CLIENT_SECRET,
     code: authorizationCode,
-    redirect_uri: 'http://localhost:3000/nibe/',
+    redirect_uri: 'http://localhost:'+process.env.PORT+'/nibe/',
     scope: 'READSYSTEM'
   }
 
@@ -80,7 +80,7 @@ app.use((err, req, res, next) => {
 });
 
 // Listen on pc port
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 /* const options = {
   key:  fs.readFileSync( path.join(__dirname, './cert/key.pem') ),
