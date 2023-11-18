@@ -4,7 +4,9 @@
   "description": "Spot the spot price for nibe to use.",
   "main": "App.js",
   "scripts": {
-    "start": "node App.js",
+    "start": "concurrently \"node App.js\" \"npm run start-front\"",
+    "start-back": "node App.js",
+    "start-front": "npm start --prefix front",
     "test": "jest"
   },
   "repository": {
@@ -29,6 +31,7 @@
     "mariadb": "^3.1.1"
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "jest": "^29.3.1",
     "mockdate": "^3.0.5"
   }
