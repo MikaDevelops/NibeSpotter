@@ -1,13 +1,72 @@
 require('dotenv').config();
 
 const express = require("express");
-const app = express();
+const app     = express();
+const fs      = require('fs');
+const path    = require('path');
+const https   = require('node:https');
+const axios   = require('axios');
+
+// Object for token and others like.
+const states  = {};
+// Margin seconds setting for token refressing.
+const refreshAdvanceSeconds = 20;
 
 // Middleware
 app.use(express.json()); // parse json bodies in the request object
 
 // Redirect requests to endpoint starting with /posts to postRoutes.js
 //app.use("/posts", require("./routes/postRoutes"));
+
+/**
+ * Redirect from Nibe with parameters.
+ */
+app.get('/nibe', (req, res2)=>{
+  const authorizationCode = req.query.code;
+  const responseState = req.query.state;
+
+  // Something is wrong if the API doesn't include state.
+  if (responseState != states.state) {
+    console.error("State parameter not same as in response from API! Exiting program.");
+    process.exit(1);
+  }
+
+  const options = {
+    grant_type: 'authorization_code',
+    client_id: process.env.NIBE_CLIENT_ID,
+    client_secret: process.env.NIBE_CLIENT_SECRET,
+    code: authorizationCode,
+    redirect_uri: 'http://localhost:3000/nibe/',
+    scope: 'READSYSTEM'
+  }
+
+  axios.post(
+    'https://api.nibeuplink.com/oauth/token', options,
+    {headers: {'content-type':'application/x-www-form-urlencoded'}},
+  )
+    .then(res=>{
+      console.log('post to token status: ', res.status);
+      let token = {
+        access_token: res.data.access_token,
+        refresh_token: res.data.refresh_token,
+        token_type: res.data.token_type,
+        expires_in: res.data.expires_in,
+        scope: res.data.scope,
+        timestamp: new Date()
+      }
+      updateTokenToStates(token);
+      refreshTokenInterval(parseInt(token.expires_in, 10));
+    })
+    .catch(err=>{console.log('Error message: ' + err.message + " ")});
+
+    res2.redirect('http://localhost:3001');
+});
+
+app.get('/', (req, res)=>{
+  states.state = Math.floor(Math.random()*10000000000);
+  res.redirect('https://api.nibeuplink.com/oauth/authorize?response_type=code&client_id=' + process.env.NIBE_CLIENT_ID + '&scope=READSYSTEM&redirect_uri=http://localhost:3000/nibe/&state=' + states.state);
+
+});
 
 // Global Error Handler. IMPORTANT function params MUST start with err
 app.use((err, req, res, next) => {
@@ -22,4 +81,57 @@ app.use((err, req, res, next) => {
 
 // Listen on pc port
 const PORT = process.env.PORT || 3000;
+
+/* const options = {
+  key:  fs.readFileSync( path.join(__dirname, './cert/key.pem') ),
+  cert: fs.readFileSync( path.join(__dirname, './cert/cert.pem') )
+}; 
+https.createServer( options, app ).listen( PORT );*/
+
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
+
+function updateTokenToStates(token){
+  states.token = token;
+}
+
+function refreshToken(){
+
+  const options = {
+    grant_type: 'refresh_token',
+    client_id: process.env.NIBE_CLIENT_ID,
+    client_secret: process.env.NIBE_CLIENT_SECRET,
+    refresh_token: states.token.refresh_token
+  }
+
+  axios.post(
+    'https://api.nibeuplink.com/oauth/token', options,
+    {headers: {'content-type':'application/x-www-form-urlencoded'}},
+  )
+    .then(res=>{
+      console.log('response for refresh: ', res.status);
+      
+      states.token.access_token   = res.data.access_token;
+      states.token.refresh_token  = res.data.refresh_token;
+      states.token.expires_in     = res.data.expires_in;
+      states.token.timestamp      = new Date();
+
+      refreshTokenInterval(parseInt(states.token.expires_in, 10));
+
+      console.log("refreshed token \n" + states.token.timestamp +"\n");
+
+    })
+    .catch(err=>{console.log('Error message: ' + err.message + " ")});
+
+  
+}
+
+function refreshTokenInterval(expirationTime){
+
+  if (!Number.isInteger(expirationTime)) throw new Error ("refreshToken: Given parameter is not an integer.");
+  else {
+
+    let milliseconds = (expirationTime-refreshAdvanceSeconds)*1000;
+    setTimeout(()=>refreshToken(),milliseconds);
+  
+  }
+}
