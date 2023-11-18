@@ -59,12 +59,12 @@ app.get('/nibe', (req, res2)=>{
     })
     .catch(err=>{console.log('Error message: ' + err.message + " ")});
 
-    res2.redirect('http://localhost:3001');
+    res2.redirect(process.env.FRONT_END_ADDRESS);
 });
 
 app.get('/', (req, res)=>{
   states.state = Math.floor(Math.random()*10000000000);
-  res.redirect('https://api.nibeuplink.com/oauth/authorize?response_type=code&client_id=' + process.env.NIBE_CLIENT_ID + '&scope=READSYSTEM&redirect_uri=http://localhost:3000/nibe/&state=' + states.state);
+  res.redirect('https://api.nibeuplink.com/oauth/authorize?response_type=code&client_id=' + process.env.NIBE_CLIENT_ID + '&scope=READSYSTEM&redirect_uri=http://localhost:'+process.env.PORT+'/nibe/&state=' + states.state);
 
 });
 
