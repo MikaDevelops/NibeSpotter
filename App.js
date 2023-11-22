@@ -6,6 +6,7 @@ const fs      = require('fs');
 const path    = require('path');
 const https   = require('node:https');
 const axios   = require('axios');
+const cors    = require('cors');
 
 const states  = {
   token: {
@@ -22,6 +23,7 @@ const states  = {
 const refreshAdvanceSeconds = 20;
 
 // Middleware
+app.use(cors());
 app.use(express.json()); // parse json bodies in the request object
 
 // Redirect requests to endpoint starting with /posts to postRoutes.js
