@@ -7,8 +7,17 @@ const path    = require('path');
 const https   = require('node:https');
 const axios   = require('axios');
 
-// Object for token and others like.
-const states  = {};
+const states  = {
+  token: {
+      access_token: null,
+      refresh_token: null,
+      token_type: null,
+      expires_in: null,
+      scope: null,
+      timestamp: null,
+  }
+};
+
 // Margin seconds setting for token refressing.
 const refreshAdvanceSeconds = 20;
 
@@ -45,16 +54,19 @@ app.get('/nibe', (req, res2)=>{
     {headers: {'content-type':'application/x-www-form-urlencoded'}},
   )
     .then(res=>{
+
       console.log('post to token status: ', res.status);
+    
       let token = {
-        access_token: res.data.access_token,
+        access_token:  res.data.access_token,
         refresh_token: res.data.refresh_token,
-        token_type: res.data.token_type,
-        expires_in: res.data.expires_in,
-        scope: res.data.scope,
-        timestamp: new Date()
+        token_type:    res.data.token_type,
+        expires_in:    res.data.expires_in,
+        scope:         res.data.scope,
+        timestamp:     new Date()
       }
-      updateTokenToStates(token);
+
+      setTokenToStates(token);
       refreshTokenInterval(parseInt(token.expires_in, 10));
     })
     .catch(err=>{console.log('Error message: ' + err.message + " ")});
@@ -62,10 +74,18 @@ app.get('/nibe', (req, res2)=>{
     res2.redirect(process.env.FRONT_END_ADDRESS);
 });
 
+/**
+ * Redirect browser to Nibeuplink login page.
+ */
 app.get('/', (req, res)=>{
   states.state = Math.floor(Math.random()*10000000000);
-  res.redirect('https://api.nibeuplink.com/oauth/authorize?response_type=code&client_id=' + process.env.NIBE_CLIENT_ID + '&scope=READSYSTEM&redirect_uri=http://localhost:'+process.env.PORT+'/nibe/&state=' + states.state);
+  res.redirect('https://api.nibeuplink.com/oauth/authorize?response_type=code&client_id=' + process.env.NIBE_CLIENT_ID 
+  + '&scope=READSYSTEM&redirect_uri=http://localhost:'+process.env.PORT+'/nibe/&state=' + states.state);
+});
 
+app.get('/checktokenstatus', (req,res)=>{
+  let tokenValid = checkTokenValid();
+  res.json({tokenIsValid: tokenValid});
 });
 
 // Global Error Handler. IMPORTANT function params MUST start with err
@@ -90,7 +110,7 @@ https.createServer( options, app ).listen( PORT );*/
 
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
 
-function updateTokenToStates(token){
+function setTokenToStates(token) {
   states.token = token;
 }
 
