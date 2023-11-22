@@ -155,3 +155,23 @@ function refreshTokenInterval(expirationTime){
   
   }
 }
+
+function checkTokenValid(){
+  if (states.token.access_token != null ) {
+
+    if (
+      states.token.timestamp.valueOf()+(states.token.expires_in*1000-refreshAdvanceSeconds*1000)
+      > Date.now()
+    ) 
+      {
+
+        return true;
+
+      } else {
+        return false;
+      }
+
+  } else {
+    return false;
+  }
+}
