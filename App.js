@@ -70,10 +70,12 @@ app.get('/nibe', (req, res2)=>{
 
       setTokenToStates(token);
       refreshTokenInterval(parseInt(token.expires_in, 10));
+      res2.redirect(process.env.FRONT_END_ADDRESS);
+      
     })
     .catch(err=>{console.log('Error message: ' + err.message + " ")});
 
-    res2.redirect(process.env.FRONT_END_ADDRESS);
+    
 });
 
 /**
