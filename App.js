@@ -70,10 +70,11 @@ app.get('/nibe', (req, res2)=>{
 
       setTokenToStates(token);
       refreshTokenInterval(parseInt(token.expires_in, 10));
+      getSystemInformation();
       res2.redirect(process.env.FRONT_END_ADDRESS);
       
     })
-    .catch(err=>{console.log('Error message: ' + err.message + " ")});
+    .catch(err=>{console.log('Error message: ' + err.message + " ");});
 
     
 });
@@ -106,16 +107,15 @@ app.use((err, req, res, next) => {
 // Listen on pc port
 const PORT = process.env.PORT || 3001;
 
-/* const options = {
-  key:  fs.readFileSync( path.join(__dirname, './cert/key.pem') ),
-  cert: fs.readFileSync( path.join(__dirname, './cert/cert.pem') )
-}; 
-https.createServer( options, app ).listen( PORT );*/
-
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
 
 function setTokenToStates(token) {
   states.token = token;
+}
+
+function setSystemInfoToStates(info){
+  states.systemInfo = info;
+  console.log(states.systemInfo);
 }
 
 function refreshToken(){
@@ -168,14 +168,30 @@ function checkTokenValid(){
       > Date.now()
     ) 
       {
-
         return true;
-
-      } else {
+      } 
+      else {
         return false;
       }
 
-  } else {
+  }
+  else {
     return false;
   }
+}
+
+function getSystemInformation(){
+
+  axios.get('https://api.nibeuplink.com/api/v1/systems', {
+    headers:{'Authorization': `Bearer ${states.token.access_token}`}
+    })
+
+    .then((res)=>{
+      // Only system object [0].
+      setSystemInfoToStates(res.data.objects[0]);
+    })
+
+    .catch(err=>{
+      console.log('Error message (testAuthorization function): ' + err.message);
+    });
 }
