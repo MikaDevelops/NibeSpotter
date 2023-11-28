@@ -19,7 +19,7 @@ const states  = {
   }
 };
 
-// Margin seconds setting for token refressing.
+// Advance seconds setting for token refressing.
 const refreshAdvanceSeconds = 20;
 
 // Middleware
@@ -30,13 +30,13 @@ app.use(express.json()); // parse json bodies in the request object
 //app.use("/posts", require("./routes/postRoutes"));
 
 /**
- * Redirect from Nibe with parameters.
+ * Redirected from Nibeuplink with authorization code.
  */
 app.get('/nibe', (req, res2)=>{
   const authorizationCode = req.query.code;
   const responseState = req.query.state;
 
-  // Something is wrong if the API doesn't include state.
+  // Something is wrong if the Nibe API doesn't include state.
   if (responseState != states.state) {
     console.error("State parameter not same as in response from API! Exiting program.");
     process.exit(1);
