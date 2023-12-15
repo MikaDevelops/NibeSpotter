@@ -68,7 +68,7 @@ app.get('/nibe', (req, res2)=>{
         timestamp:     new Date()
       }
 
-      setTokenToStates(token);
+      setStatePropertyWithName("token", token);
       refreshTokenInterval(parseInt(token.expires_in, 10));
       getSystemInformation();
       res2.redirect(process.env.FRONT_END_ADDRESS);
@@ -109,13 +109,9 @@ const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
 
-function setTokenToStates(token) {
-  states.token = token;
-}
-
-function setSystemInfoToStates(info){
-  states.systemInfo = info;
-  console.log(states.systemInfo);
+function setStatePropertyWithName(name, value){
+  states[name] = value;
+  console.log(states);
 }
 
 function refreshToken(){
@@ -187,8 +183,8 @@ function getSystemInformation(){
     })
 
     .then((res)=>{
-      // Only system object [0].
-      setSystemInfoToStates(res.data.objects[0]);
+      // Only system object [0]. If multiple systems needs to be refactored.
+      setStatePropertyWithName("systemInfo", res.data.objects[0]);
     })
 
     .catch(err=>{
