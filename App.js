@@ -21,6 +21,7 @@ const states  = {
 
 // Advance seconds setting for token refressing.
 const refreshAdvanceSeconds = 20;
+const systemStatusUpdateIntervalSeconds = 180;
 
 // Middleware
 app.use(cors());
@@ -93,6 +94,13 @@ app.get('/checktokenstatus', (req,res)=>{
   res.json({tokenIsValid: tokenValid});
 });
 
+app.get('/getsystemstatus', (req, res)=>{
+  res.json({
+    systemStatus: states.systemStatus,
+    parameters: states.parameters
+  });
+});
+
 // Global Error Handler. IMPORTANT function params MUST start with err
 app.use((err, req, res, next) => {
   console.log(err.stack);
@@ -100,7 +108,7 @@ app.use((err, req, res, next) => {
   console.log(err.code);
 
   res.status(500).json({
-    message: "Something went really wrong",
+    message: "Something went really wrong: " + err.message,
   });
 });
 
@@ -109,9 +117,13 @@ const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
 
+/**
+ * Sets name:key value pair to states object.
+ * @param {string} name key or name for the property
+ * @param {*} value to be given to property
+ */
 function setStatePropertyWithName(name, value){
   states[name] = value;
-  console.log(states);
 }
 
 function refreshToken(){
@@ -178,16 +190,51 @@ function checkTokenValid(){
 
 function getSystemInformation(){
 
-  axios.get('https://api.nibeuplink.com/api/v1/systems', {
-    headers:{'Authorization': `Bearer ${states.token.access_token}`}
-    })
-
+    getToApi('')
     .then((res)=>{
       // Only system object [0]. If multiple systems needs to be refactored.
       setStatePropertyWithName("systemInfo", res.data.objects[0]);
+    }).then (()=>{
+      updateSystemStatus();
     })
-
     .catch(err=>{
-      console.log('Error message (testAuthorization function): ' + err.message);
+      console.log('Error message (getSystemInformation function): ' + err.message);
     });
+}
+
+function getToApi(endOfUrl){
+  if (endOfUrl==undefined || endOfUrl == null) endOfUrl='';
+  if (endOfUrl[0] != '/') endOfUrl = '/' + endOfUrl;
+  return axios.get(`https://api.nibeuplink.com/api/v1/systems${endOfUrl}`, {
+    headers:{'Authorization': `Bearer ${states.token.access_token}`}
+    });
+}
+
+function updateSystemInterval(){
+  setTimeout(()=>{updateSystemStatus()}, systemStatusUpdateIntervalSeconds*1000);
+}
+
+function updateSystemStatus(){
+
+  getToApi(`/${states.systemInfo.systemId}/status/system`)
+
+  .then((res)=>{
+    setStatePropertyWithName('systemStatus', res.data);
+  })
+
+  .then(()=>{
+
+    getToApi(`/${states.systemInfo.systemId}/parameters?parameterIds=40004&parameterIds=47398`)
+      .then((res)=>{
+        setStatePropertyWithName('parameters', res.data);
+        updateSystemInterval();
+      }
+    );
+
+  })
+
+  .catch((err)=>{
+    console.log('Error message (updateSystemStatus): ' + err.message);
+  });
+
 }

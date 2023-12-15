@@ -13,6 +13,7 @@ JavaScript, SQL (MariaDB), React, Jest
 - [x] extracting data from Json
 - [x] saving extracted data to database
 - [x] authentication to Nibeuplink-service
+- [x] read parameter info
 - [ ] front-end user interface
 - [ ] authentication to front-end services
 
@@ -25,3 +26,4 @@ JavaScript, SQL (MariaDB), React, Jest
 ### Relational Schema
 
 ![Relational schema](/readme_img/RelationalSchema.png)
+
