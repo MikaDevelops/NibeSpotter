@@ -13,6 +13,7 @@ Concurrently used to start both servers with `npm start`
 - [x] extracting data from Json
 - [x] saving extracted data to database
 - [x] authentication to Nibeuplink-service
+- [x] read parameter info
 - [ ] front-end user interface
 - [ ] authentication to front-end services
 
@@ -25,3 +26,4 @@ Concurrently used to start both servers with `npm start`
 ### Relational Schema
 
 ![Relational schema](/readme_img/RelationalSchema.png)
+

@@ -105,3 +105,6 @@ dist
 
 # Read.me images directory
 readme_img/
+
+# vscode
+.vscode/
