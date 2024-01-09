@@ -7,7 +7,7 @@
     "start": "concurrently \"node App.js\" \"npm run start-front\"",
     "start-back": "node App.js",
     "start-front": "npm start --prefix front",
-    "test": "jest"
+    "test": "jest --coverage --verbose"
   },
   "repository": {
     "type": "git",

@@ -224,9 +224,10 @@ function updateSystemStatus(){
 
   .then(()=>{
 
-    getToApi(`/${states.systemInfo.systemId}/parameters?parameterIds=40004&parameterIds=47398`)
+    getToApi(`/${states.systemInfo.systemId}/parameters?parameterIds=40004&parameterIds=47398&parameterIds=47388`)
       .then((res)=>{
         setStatePropertyWithName('parameters', res.data);
+        //getAllParameters();
         updateSystemInterval();
       }
     );
@@ -237,4 +238,11 @@ function updateSystemStatus(){
     console.log('Error message (updateSystemStatus): ' + err.message);
   });
 
+}
+
+function getAllParameters(){
+  getToApi(`/${states.systemInfo.systemId}/serviceinfo/categories?parameters=true`)
+  .then((res)=>{
+    console.log("get service info" + res.data);
+  })
 }
