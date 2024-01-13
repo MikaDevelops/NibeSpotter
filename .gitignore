@@ -108,3 +108,6 @@ readme_img/
 
 # vscode
 .vscode/
+
+# sqlite database folder
+db/
