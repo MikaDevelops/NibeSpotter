@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+
 }
 
 .App-logo {
@@ -26,6 +27,18 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.air_supply {
+  width: 0;
+	height: 0;
+	border-left: 60px solid transparent;
+	border-right: 60px solid transparent;
+	border-top: 30px solid green;
+  display: inline-block;
+
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes App-logo-spin {

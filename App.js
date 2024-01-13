@@ -96,8 +96,8 @@ app.get('/checktokenstatus', (req,res)=>{
 
 app.get('/getsystemstatus', (req, res)=>{
   res.json({
-    systemStatus: states.systemStatus,
-    parameters: states.parameters
+    systemStatus: states.systemStatus ? states.systemStatus:'no info available',
+    parameters: states.parameters ? states.parameters: 'no info available'
   });
 });
 

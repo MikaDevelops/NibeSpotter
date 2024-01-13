@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/MikaDevelops/NibeSpotter#readme",
   "dependencies": {
+    "@types/jest": "^29.5.11",
     "axios": "^1.4.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",

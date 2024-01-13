@@ -40,12 +40,18 @@ class App extends React.Component {
 
   updateSystemInfo(){
     axios.get('http://localhost:3001/getsystemstatus').then((res)=>{
-      let newdata = {
-        fanSpeed: res.data.systemStatus[1].parameters[0].displayValue,
-        exhaustAir: res.data.systemStatus[1].parameters[1].displayValue,
-        extractAir: res.data.systemStatus[1].parameters[2].displayValue,
-        supplyAir: res.data.systemStatus[1].parameters[3].displayValue,
+      let newdata={};
+      if (res.data.systemStatus === 'no info available') {
+        newdata = {fanSpeed: 'no info', exhaustAir: 'no info', extractAir: 'no info', supplyAir: 'no info'};
+      }
+      else {
+        newdata = {
+        fanSpeed: res.data.systemStatus[1].parameters[0].displayValue ? res.data.systemStatus[1].parameters[0].displayValue : 'no info',
+        exhaustAir: res.data.systemStatus[1].parameters[1].displayValue ? res.data.systemStatus[1].parameters[1].displayValue : 'no info',
+        extractAir: res.data.systemStatus[1].parameters[2].displayValue ? res.data.systemStatus[1].parameters[2].displayValue : 'no info',
+        supplyAir: res.data.systemStatus[1].parameters[3].displayValue ? res.data.systemStatus[1].parameters[3].displayValue : 'no info',
       };
+    }
       this.setState({systemInfo: newdata});
       if (this.state.sysInfoUpdateInterval > 0) setTimeout(()=>{this.updateSystemInfo()}, this.state.sysInfoUpdateInterval*1000);
     });
