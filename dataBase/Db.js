@@ -74,6 +74,16 @@ class Db{
 
         }else{
             const sqlString = this.#makeSqlInsertString(data);
+            const db = this.#openDatabase();
+            db.run(sqlString, function(err){
+                if(err) console.log(err);
+                console.log(
+                    'Spotprice data inserted. Last row id: ' 
+                    + this.lastID 
+                    + ', rows inserted: '+this.changes
+                    );
+            });
+            this.#closeDataBase(db);
         }
     }
 
@@ -158,7 +168,7 @@ class Db{
         let valuesString = '';
 
         for(let i=0; i < data.length; i+=3){
-            valuesString += `('${data[i]}','${data[i+1]}','${data[i+2]}')`;
+            valuesString += `('${data[i]}','${data[i+1]}','${data[i+2]}','FI')`;
             if(i < data.length-3) valuesString += ',';
         }
 
