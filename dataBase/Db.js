@@ -71,7 +71,6 @@ class Db{
     saveSpotData(data){
         if (data.length > 100) {
             throw new Error ('spot data too long');
-
         }else{
             const sqlString = this.#makeSqlInsertString(data);
             const db = this.#openDatabase();
@@ -85,6 +84,42 @@ class Db{
             });
             this.#closeDataBase(db);
         }
+    }
+
+    /**
+     * Gets spot price data from database inbetween given startTime parameters. If no parameters are
+     * passed or an empty array is passed, returns max 10000 lines from database.
+     * @param {Array} timestamp start time, end time. If empty array is passed gets all rows in table.
+     * @returns 
+     */
+    getSpotData(timestamp) {
+
+        let sqlString = `SELECT 
+        ${this.#spotDataModel.idField}, ${this.#spotDataModel.dataFields[0]},
+        ${this.#spotDataModel.dataFields[1]}, ${this.#spotDataModel.dataFields[2]}
+        FROM ${this.#spotDataModel.tableName}`;
+
+        if(timestamp != undefined){
+            if(timestamp[0] != undefined) {
+                sqlString += ` WHERE ${this.#spotDataModel.idField}`;
+                if(timestamp[1] != undefined){
+                    sqlString += ' BETWEEN ? AND ?';
+                }else {
+                    sqlString += ' = ?';
+                }
+            }
+        }else{
+            timestamp = [];
+        }
+
+        sqlString += ` ORDER BY ${this.#spotDataModel.idField} ASC LIMIT 10000;`
+
+        const db = this.#openDatabase();
+        db.all(sqlString, timestamp, function(err, rows){
+            if(err) console.log(err);
+            console.log(rows); // TODO: remember to update the docs.
+        })
+        return null;
     }
 
     #openDatabase(){
