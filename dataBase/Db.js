@@ -214,17 +214,16 @@ class Db{
 
         let valuesString = '';
 
-        for(let i=0; i < data.length; i+=3){
+        for(let i=0; i < data.length; i+=4){
             valuesString += `('${data[i]}','${data[i+1]}','${data[i+2]}','FI')`;
-            if(i < data.length-3) valuesString += ',';
+            if(i < data.length-4) valuesString += ',';
         }
 
         let insertString = `INSERT INTO ${this.#spotDataModel.tableName}(
             ${this.#spotDataModel.idField},${this.#spotDataModel.dataFields[0]},
             ${this.#spotDataModel.dataFields[1]}, ${this.#spotDataModel.dataFields[2]})
             VALUES `+valuesString +';';
-        
-        console.log(insertString);
+
         return insertString;
     }
 }
