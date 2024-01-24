@@ -89,36 +89,43 @@ class Db{
     /**
      * Gets spot price data from database inbetween given startTime parameters. If no parameters are
      * passed or an empty array is passed, returns max 10000 lines from database.
-     * @param {Array} timestamp start time, end time. If empty array is passed gets all rows in table.
-     * @returns 
+     * @param {Array<string>} timestamps start time, end time. If empty array is passed gets all rows in table.
+     * @returns {object[]} array of row objects.
      */
-    getSpotData(timestamp) {
+    getSpotData(timestamps=undefined) {
+
+        if (Array.isArray(timestamps) && timestamps.length>2) throw new Error('getSpotData parameter array too long');
+        if (!Array.isArray(timestamps) && timestamps != undefined) throw new Error ('getSpotData parameter not an array');
+        console.log(Array.isArray(timestamps));
 
         let sqlString = `SELECT 
         ${this.#spotDataModel.idField}, ${this.#spotDataModel.dataFields[0]},
         ${this.#spotDataModel.dataFields[1]}, ${this.#spotDataModel.dataFields[2]}
         FROM ${this.#spotDataModel.tableName}`;
 
-        if(timestamp != undefined){
-            if(timestamp[0] != undefined) {
+        if(timestamps != undefined){
+            if(timestamps[0] != undefined) {
                 sqlString += ` WHERE ${this.#spotDataModel.idField}`;
-                if(timestamp[1] != undefined){
+                if(timestamps[1] != undefined){
                     sqlString += ' BETWEEN ? AND ?';
-                }else {
+                }else 
+                {
                     sqlString += ' = ?';
                 }
             }
         }else{
-            timestamp = [];
+            timestamps = [];
         }
 
         sqlString += ` ORDER BY ${this.#spotDataModel.idField} ASC LIMIT 10000;`
 
         const db = this.#openDatabase();
-        db.all(sqlString, timestamp, function(err, rows){
+        db.all(sqlString, timestamps, function(err, rows){
             if(err) console.log(err);
-            console.log(rows); // TODO: remember to update the docs.
-        })
+
+            console.log(rows);
+        });
+        this.#closeDataBase(db);
         return null;
     }
 
