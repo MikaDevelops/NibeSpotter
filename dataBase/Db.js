@@ -1,3 +1,5 @@
+const path = require('path');
+const pathToSqlite = path.resolve('..','db','nibespotter.db');
 class Db{
  
     #typeOfDb;
@@ -9,7 +11,7 @@ class Db{
      * @param {string} typeOfDb 'sqlite' or 'mariadb' 
      * @param {string} dataBaseAddress default is for sqlite (db/nibespotter.db)
      */
-    constructor(typeOfDb='sqlite', dataBaseAddress = '.db/nibespotter.db'){
+    constructor(typeOfDb='sqlite', dataBaseAddress = pathToSqlite){
         if (typeOfDb !== 'sqlite' && typeOfDb !== 'mariadb'){
             throw new Error('Db constructor: Not supported db-solution.');
         }
