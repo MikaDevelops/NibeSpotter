@@ -1,5 +1,5 @@
 require('dotenv').config({path: '../.env'});
-const { setTimeout } = require('timers/promises');
+const { isTodaysDataSaved } = require('../spotPrice/IsTodaysDataSaved.js');
 const database = require('./Db.js');
 const path = require('path');
 
@@ -41,8 +41,8 @@ let tooLongDataSet = [
 // test('database test', ()=> {
 //saveSpotData(dataset);
 
-let pathToDb = path.resolve('..', 'db', 'nibespotter.db');
-const db = new database.Db('sqlite',pathToDb);
+//let pathToDb = path.resolve('..', 'db', 'nibespotter.db');
+const db = new database.Db();
 
 // start procedure
 db.start();
@@ -72,5 +72,35 @@ db.checkIfTableExists('locaftion').then(
 // db.saveSpotData(tooLongDataSet);
 
 // check that saved data is get from database
-let timestamp = []
-let spotprices = db.getSpotData(['2000-01-02T16:00:00', '2000-01-02T18:00:00']);
+// db.getSpotData(['2000-01-02T16:00:00','2000-01-02T17:00:00']).then((rows)=>{console.log(rows);});
+
+let mockSpotData = [
+    '2024-01-25T00:00:00','2024-01-25T01:00:00',6.75,'FI',
+    '2024-01-25T01:00:00','2024-01-25T02:00:00',6.76,'FI',
+    '2024-01-25T02:00:00','2024-01-25T03:00:00',6.77,'FI',
+    '2024-01-25T03:00:00','2024-01-25T04:00:00',6.78,'FI',
+    '2024-01-25T04:00:00','2024-01-25T05:00:00',6.79,'FI',
+    '2024-01-25T05:00:00','2024-01-25T06:00:00',6.80,'FI',
+    '2024-01-25T06:00:00','2024-01-25T07:00:00',6.81,'FI',
+    '2024-01-25T07:00:00','2024-01-25T08:00:00',6.82,'FI',
+    '2024-01-25T08:00:00','2024-01-25T09:00:00',6.83,'FI',
+    '2024-01-25T09:00:00','2024-01-25T10:00:00',6.84,'FI',
+    '2024-01-25T10:00:00','2024-01-25T11:00:00',6.85,'FI',
+    '2024-01-25T11:00:00','2024-01-25T12:00:00',6.86,'FI',
+    '2024-01-25T12:00:00','2024-01-25T13:00:00',6.87,'FI',
+    '2024-01-25T13:00:00','2024-01-25T14:00:00',6.88,'FI',
+    '2024-01-25T14:00:00','2024-01-25T15:00:00',6.89,'FI',
+    '2024-01-25T15:00:00','2024-01-25T16:00:00',6.90,'FI',
+    '2024-01-25T16:00:00','2024-01-25T17:00:00',6.91,'FI',
+    '2024-01-25T17:00:00','2024-01-25T18:00:00',6.92,'FI',
+    '2024-01-25T18:00:00','2024-01-25T19:00:00',6.93,'FI',
+    '2024-01-25T19:00:00','2024-01-25T20:00:00',6.94,'FI',
+    '2024-01-25T20:00:00','2024-01-25T21:00:00',6.95,'FI',
+    '2024-01-25T21:00:00','2024-01-25T22:00:00',6.96,'FI',
+    '2024-01-25T22:00:00','2024-01-25T23:00:00',6.97,'FI',
+    '2024-01-25T23:00:00','2024-01-26T00:00:00',6.98,'FI'
+]
+
+//db.saveSpotData(mockSpotData);
+
+isTodaysDataSaved().then((res)=>{console.log(res)})
