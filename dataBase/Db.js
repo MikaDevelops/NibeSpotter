@@ -19,6 +19,9 @@ class Db{
         this.#spotDataModel = spotDataModel;
     }
 
+    /**
+     * Runs start procedures for database. Checks database and creates tables if not yet created.
+     */
     start(){
 
         switch(this.#typeOfDb) {
@@ -94,39 +97,41 @@ class Db{
      */
     getSpotData(timestamps=undefined) {
 
-        if (Array.isArray(timestamps) && timestamps.length>2) throw new Error('getSpotData parameter array too long');
+        if (Array.isArray(timestamps) && timestamps.length>2) throw new Error('getSpotData parameter array has more than 2 elements');
         if (!Array.isArray(timestamps) && timestamps != undefined) throw new Error ('getSpotData parameter not an array');
-        console.log(Array.isArray(timestamps));
 
-        let sqlString = `SELECT 
-        ${this.#spotDataModel.idField}, ${this.#spotDataModel.dataFields[0]},
-        ${this.#spotDataModel.dataFields[1]}, ${this.#spotDataModel.dataFields[2]}
-        FROM ${this.#spotDataModel.tableName}`;
+        return new Promise((resolve, reject)=>{
+            let sqlString = `SELECT ${this.#spotDataModel.idField}, ${this.#spotDataModel.dataFields[0]},
+            ${this.#spotDataModel.dataFields[1]}, ${this.#spotDataModel.dataFields[2]}
+            FROM ${this.#spotDataModel.tableName}`;
 
-        if(timestamps != undefined){
-            if(timestamps[0] != undefined) {
-                sqlString += ` WHERE ${this.#spotDataModel.idField}`;
-                if(timestamps[1] != undefined){
-                    sqlString += ' BETWEEN ? AND ?';
-                }else 
-                {
-                    sqlString += ' = ?';
+            if(timestamps != undefined){
+                if(timestamps[0] != undefined) {
+                    sqlString += ` WHERE ${this.#spotDataModel.idField}`;
+                    if(timestamps[1] != undefined){
+                        sqlString += ' BETWEEN ? AND ?';
+                    }else 
+                    {
+                        sqlString += ' = ?';
+                    }
                 }
+            }else{
+                timestamps = [];
             }
-        }else{
-            timestamps = [];
-        }
 
-        sqlString += ` ORDER BY ${this.#spotDataModel.idField} ASC LIMIT 10000;`
+            sqlString += ` ORDER BY ${this.#spotDataModel.idField} ASC LIMIT 10000;`
 
-        const db = this.#openDatabase();
-        db.all(sqlString, timestamps, function(err, rows){
-            if(err) console.log(err);
-
-            console.log(rows);
+            const db = this.#openDatabase();
+            db.all(sqlString, timestamps, function(err, rows){
+                if(err){
+                    reject(err);
+                }
+                //console.log(rows);
+                resolve(rows);
+            });
+            this.#closeDataBase(db);
         });
-        this.#closeDataBase(db);
-        return null;
+        
     }
 
     #openDatabase(){
