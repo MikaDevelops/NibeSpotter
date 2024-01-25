@@ -136,6 +136,10 @@ class Db{
         
     }
 
+    /**
+     * Loads last 24 entries from spot price table.
+     * @returns {Array<object>} Array of row objects.
+     */
     getLatest24h(){
         return new Promise((resolve, reject)=>{
             let sqlString =
