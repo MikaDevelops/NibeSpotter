@@ -1,5 +1,5 @@
 const path = require('path');
-const pathToSqlite = path.resolve('..','db','nibespotter.db');
+const pathToSqlite = path.resolve('db','nibespotter.db');
 class Db{
  
     #typeOfDb;
