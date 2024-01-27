@@ -17,11 +17,14 @@ const states  = {
       scope: null,
       timestamp: null,
   }
+
+
 };
 
 // Advance seconds setting for token refressing.
 const refreshAdvanceSeconds = 20;
 const systemStatusUpdateIntervalSeconds = 180;
+const timeOfPriceUpdateUTC = [12,0];
 
 // Middleware
 app.use(cors());
