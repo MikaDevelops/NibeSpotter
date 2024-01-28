@@ -4,6 +4,7 @@ class SpotPrice{
 
     #timeOfSpotPriceUdpate;
     #firstRun = true;
+    #threshold = 5000;
 
     /**
      * 
@@ -21,9 +22,17 @@ class SpotPrice{
 
         }
         else {
+            // start timer 
+            this.#spotPriceUpdateTimer(
+                this.countTimeDifferenceToUpdate(new Date())
+            );
 
+            // start today data fetching
+            if(this.#firstRun) this.#updateTodaysData();
+
+            this.#firstRun = false;
         }
-        console.log(this.#checkIsTimeTodayAfer());
+
     }
 
     #validateTimeFormat(time){
@@ -37,7 +46,8 @@ class SpotPrice{
     #checkIsTimeTodayAfer(){
         let today = new Date();
         let checkTime = this.#makeDateWithTimeOfSpotPriceUpdate();
-        if (today.valueOf() > checkTime.valueOf()) return true;
+        checkTime.setTime(checkTime.valueOf()+this.#threshold)
+        if (today.valueOf() >= checkTime.valueOf()) return true;
         else return false;
     }
 
@@ -47,23 +57,34 @@ class SpotPrice{
         return utcDate;
     }
 
+    // TODO: to private method
     countTimeDifferenceToUpdate(time){
 
         let spotUpdateTime = this.#makeDateWithTimeOfSpotPriceUpdate();
         let timeDiff = spotUpdateTime.valueOf() - time.valueOf();
         
         if(timeDiff<0){
-            spotUpdateTime.setTime(spotUpdateTime.valueOf() + 86400000);
-            console.log(spotUpdateTime.valueOf());
-            timeDiff = spotUpdateTime.valueOf() - time.valueOf();
+            if(timeDiff > -this.#threshold){
+                timeDiff = 10000;
+            }
+            else {
+                spotUpdateTime.setTime(spotUpdateTime.valueOf() + 86400000);
+                timeDiff = spotUpdateTime.valueOf() - time.valueOf();
+            }
         }
 
         return timeDiff;
     }
 
+    #spotPriceUpdateTimer(countdownMilliseconds){
+        setTimeout(()=>{
+            this.startService();
+        }, countdownMilliseconds);
+    }
+
+    //TODO
+    #updateTodaysData(){}
+
 }
 
-// let spo=new SpotPrice([11,45]);
-// let t = spo.countTimeDifference(new Date());
-// console.log();
 module.exports={SpotPrice};

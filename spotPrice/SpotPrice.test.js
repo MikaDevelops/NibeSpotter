@@ -70,4 +70,12 @@ test('Time difference', ()=>{
     timeExact = new Date('2024-01-28T13:45');
     let timediff3 = spotPrice.countTimeDifferenceToUpdate(timeExact);
     expect(timediff3).toEqual(0);
+
+    timeInThereshold = new Date('2024-01-28T13:45:04.999');
+    let timeDiff4 = spotPrice.countTimeDifferenceToUpdate(timeInThereshold);
+    expect(timeDiff4).toEqual(10000);
 });
+
+// test('In threshold returns 10000'()=>{
+
+// });
