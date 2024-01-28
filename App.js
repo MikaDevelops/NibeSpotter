@@ -7,6 +7,8 @@ const path    = require('path');
 const https   = require('node:https');
 const axios   = require('axios');
 const cors    = require('cors');
+const {Db}    = require('./dataBase/Db');
+const { SpotPrice } = require('./spotPrice/SpotPrice');
 
 const states  = {
   token: {
@@ -24,7 +26,7 @@ const states  = {
 // Advance seconds setting for token refressing.
 const refreshAdvanceSeconds = 20;
 const systemStatusUpdateIntervalSeconds = 180;
-const timeOfPriceUpdateUTC = [12,0];
+const timeOfPriceUpdateUTC = [12,15];
 
 // Middleware
 app.use(cors());
@@ -118,7 +120,13 @@ app.use((err, req, res, next) => {
 // Listen on pc port
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on PORT ${PORT}`);
+  const dataBase = new Db();
+  dataBase.start();
+  const spotPrice = new SpotPrice(timeOfPriceUpdateUTC, dataBase);
+  spotPrice.startService();
+});
 
 /**
  * Sets name:key value pair to states object.

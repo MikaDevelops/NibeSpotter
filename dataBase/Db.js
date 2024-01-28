@@ -32,6 +32,7 @@ class Db{
                 const db = this.#openDatabase();
                 this.#createTables(db);
                 this.#closeDataBase(db);
+                console.log('Using SQLite database.');
             break;
 
             case 'mariadb':
@@ -128,7 +129,6 @@ class Db{
                 if(err){
                     reject(err);
                 }
-                //console.log(rows);
                 resolve(rows);
             });
             this.#closeDataBase(db);

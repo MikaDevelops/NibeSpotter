@@ -1,3 +1,5 @@
+const {Db} = require('./../dataBase/Db');
+const {getData} = require('./GetSpotData');
 let instance;
 
 class SpotPrice{
@@ -5,21 +7,57 @@ class SpotPrice{
     #timeOfSpotPriceUdpate;
     #firstRun = true;
     #threshold = 5000;
+    #dataBaseObject;
+    #spotData = {
+        today: undefined,
+        tomorrow: undefined
+    };
 
     /**
      * 
      * @param {Array<number>} timeOfSpotPriceUpdate give time as an array of two integers [hours, minutes] example [13,45] is 13:45.
+     * @param {Db} dataBaseObject
      */
-    constructor(timeOfSpotPriceUpdate){
+    constructor(timeOfSpotPriceUpdate, dataBaseObject){
         if(instance) throw new Error('Only one SpotPrice instance can be created');
         this.#validateTimeFormat(timeOfSpotPriceUpdate);
         this.#timeOfSpotPriceUdpate=timeOfSpotPriceUpdate;
+        this.#dataBaseObject = dataBaseObject;
         instance = this;
     }
 
-    startService(){
-        if (this.#checkIsTimeTodayAfer()){
+    async startService(){
 
+        if (this.#checkIsTimeTodayAfer()){
+            if(this.#firstRun){
+                try{
+                    let tomorrow = new Date();
+                    tomorrow.setHours(0,0,0,0)
+                    tomorrow.setTime(tomorrow.valueOf()+86400000);
+                    let firstValue = Math.floor(tomorrow.valueOf()/1000);
+                    tomorrow.setHours(23,0,0,0);
+                    let lastValue = Math.floor(tomorrow.valueOf()/1000);
+
+                    const data = await this.#dataBaseObject.getSpotData([firstValue,lastValue]);
+
+                    if(data.length > 22 && data.length < 26){
+                        this.#spotData.tomorrow = data;
+                    }
+                    else if(data.length > 0 && data.length < 23 || data.length > 25) {
+                        throw new Error(
+                        'spot data probably corrupted, check data for' + tomorrow.toISOString());
+                    }
+                    if (data.length === 0) {
+                        let spotData = await this.#fetchDataFromNordPool();
+                        console.log(spotData);
+                    }
+                    this.#firstRun =false;
+
+
+                }catch(error){
+                    console.log(error);
+                }  
+            }
         }
         else {
             // start timer 
@@ -84,6 +122,12 @@ class SpotPrice{
 
     //TODO
     #updateTodaysData(){}
+
+    async #fetchDataFromNordPool(){
+        let response = await fetch('https://www.nordpoolgroup.com/api/marketdata/page/35?currency=EUR');
+        let spotData = await response.json();
+        return spotData;
+    }
 
 }
 

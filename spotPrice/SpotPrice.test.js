@@ -75,7 +75,3 @@ test('Time difference', ()=>{
     let timeDiff4 = spotPrice.countTimeDifferenceToUpdate(timeInThereshold);
     expect(timeDiff4).toEqual(10000);
 });
-
-// test('In threshold returns 10000'()=>{
-
-// });
