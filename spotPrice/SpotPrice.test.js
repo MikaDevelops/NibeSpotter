@@ -54,3 +54,20 @@ test('Invalid time paramters raises error',()=>{
     }).toThrow('Minutes cannot be over 59.');
 
 });
+
+test('Time difference', ()=>{
+
+    const timeBefore = new Date('2024-01-28T13:44:00');
+    const timeForUpdate = [11,45];
+    const spotPrice = new SpotPrice(timeForUpdate);
+    let timediff1 = spotPrice.countTimeDifferenceToUpdate(timeBefore);
+    expect(timediff1).toEqual(60000);
+
+    timeAfter = new Date('2024-01-28T13:46');
+    let timediff2 = spotPrice.countTimeDifferenceToUpdate(timeAfter);
+    expect(timediff2).toEqual(86340000);
+
+    timeExact = new Date('2024-01-28T13:45');
+    let timediff3 = spotPrice.countTimeDifferenceToUpdate(timeExact);
+    expect(timediff3).toEqual(0);
+});

@@ -2,7 +2,8 @@ let instance;
 
 class SpotPrice{
 
-    #timeOfSpotPriceUdpate
+    #timeOfSpotPriceUdpate;
+    #firstRun = true;
 
     /**
      * 
@@ -16,6 +17,12 @@ class SpotPrice{
     }
 
     startService(){
+        if (this.#checkIsTimeTodayAfer()){
+
+        }
+        else {
+
+        }
         console.log(this.#checkIsTimeTodayAfer());
     }
 
@@ -29,18 +36,34 @@ class SpotPrice{
 
     #checkIsTimeTodayAfer(){
         let today = new Date();
-        let checkTime = new Date(
-            Date.UTC(today.getFullYear(),
-            today.getMonth(),
-            today.getDate(),
-            this.#timeOfSpotPriceUdpate[0],
-            this.#timeOfSpotPriceUdpate[1]
-            )
-        );
+        let checkTime = this.#makeDateWithTimeOfSpotPriceUpdate();
         if (today.valueOf() > checkTime.valueOf()) return true;
         else return false;
     }
 
+    #makeDateWithTimeOfSpotPriceUpdate(){
+        let utcDate = new Date();
+        utcDate.setUTCHours(this.#timeOfSpotPriceUdpate[0], this.#timeOfSpotPriceUdpate[1], 0, 0);
+        return utcDate;
+    }
+
+    countTimeDifferenceToUpdate(time){
+
+        let spotUpdateTime = this.#makeDateWithTimeOfSpotPriceUpdate();
+        let timeDiff = spotUpdateTime.valueOf() - time.valueOf();
+        
+        if(timeDiff<0){
+            spotUpdateTime.setTime(spotUpdateTime.valueOf() + 86400000);
+            console.log(spotUpdateTime.valueOf());
+            timeDiff = spotUpdateTime.valueOf() - time.valueOf();
+        }
+
+        return timeDiff;
+    }
+
 }
 
+// let spo=new SpotPrice([11,45]);
+// let t = spo.countTimeDifference(new Date());
+// console.log();
 module.exports={SpotPrice};
