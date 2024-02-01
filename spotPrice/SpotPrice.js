@@ -1,5 +1,5 @@
 const {Db} = require('./../dataBase/Db');
-const {getData} = require('./GetSpotData');
+const {extractData} = require('./ExtractData');
 let instance;
 
 class SpotPrice{
@@ -32,10 +32,11 @@ class SpotPrice{
             if(this.#firstRun){
                 try{
                     let tomorrow = new Date();
-                    tomorrow.setHours(0,0,0,0)
-                    tomorrow.setTime(tomorrow.valueOf()+86400000);
+                    tomorrow.setHours(0,0,0,0);
+                    tomorrow.setTime(tomorrow.valueOf()+90000000);
                     let firstValue = Math.floor(tomorrow.valueOf()/1000);
                     tomorrow.setHours(23,0,0,0);
+                    tomorrow.setTime(tomorrow.valueOf()+3600000);
                     let lastValue = Math.floor(tomorrow.valueOf()/1000);
 
                     const data = await this.#dataBaseObject.getSpotData([firstValue,lastValue]);
@@ -45,14 +46,17 @@ class SpotPrice{
                     }
                     else if(data.length > 0 && data.length < 23 || data.length > 25) {
                         throw new Error(
-                        'spot data probably corrupted, check data for' + tomorrow.toISOString());
+                        'spot data probably corrupted, check data for ' + tomorrow.toISOString());
                     }
                     if (data.length === 0) {
                         let spotData = await this.#fetchDataFromNordPool();
-                        console.log(spotData);
+                        const dataArray = extractData(spotData);
+                        if(dataArray.length === 0) throw new Error ('Empty tomorrow dataset from Nordpool.');
+                        this.#dataBaseObject.saveSpotData(dataArray);
+                        this.#spotData.tomorrow = dataArray;
+                        this.#spotPriceUpdateTimer(this.countTimeDifferenceToUpdate(new Date()));
                     }
                     this.#firstRun =false;
-
 
                 }catch(error){
                     console.log(error);

@@ -103,4 +103,5 @@ let mockSpotData = [
 
 //db.saveSpotData(mockSpotData);
 
-isTodaysDataSaved().then((res)=>{console.log(res)})
+isTodaysDataSaved().then((res)=>{console.log(res)});
+

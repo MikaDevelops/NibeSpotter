@@ -236,9 +236,11 @@ class Db{
 
         let valuesString = '';
 
-        for(let i=0; i < data.length; i+=4){
-            valuesString += `('${data[i]}','${data[i+1]}','${data[i+2]}','FI')`;
-            if(i < data.length-4) valuesString += ',';
+        for(let i=0; i < data.length; i+=3){
+            let startTimeUnix = Math.floor(new Date(data[i]).valueOf() / 1000);
+            let endTimeUnix = Math.floor(new Date(data[i+1]).valueOf() / 1000);
+            valuesString += `('${startTimeUnix}','${endTimeUnix}','${data[i+2]}','FI')`;
+            if(i < data.length-3) valuesString += ',';
         }
 
         let insertString = `INSERT INTO ${this.#spotDataModel.tableName}(
