@@ -28,52 +28,7 @@ class SpotPrice{
 
     async startService(){
 
-        if (this.#checkIsTimeTodayAfer()){
-            if(this.#firstRun){
-                try{
-                    let tomorrow = new Date();
-                    tomorrow.setHours(0,0,0,0);
-                    tomorrow.setTime(tomorrow.valueOf()+90000000);
-                    let firstValue = Math.floor(tomorrow.valueOf()/1000);
-                    tomorrow.setHours(23,0,0,0);
-                    tomorrow.setTime(tomorrow.valueOf()+3600000);
-                    let lastValue = Math.floor(tomorrow.valueOf()/1000);
-
-                    const data = await this.#dataBaseObject.getSpotData([firstValue,lastValue]);
-
-                    if(data.length > 22 && data.length < 26){
-                        this.#spotData.tomorrow = data;
-                    }
-                    else if(data.length > 0 && data.length < 23 || data.length > 25) {
-                        throw new Error(
-                        'spot data probably corrupted, check data for ' + tomorrow.toISOString());
-                    }
-                    if (data.length === 0) {
-                        let spotData = await this.#fetchDataFromNordPool();
-                        const dataArray = extractData(spotData);
-                        if(dataArray.length === 0) throw new Error ('Empty tomorrow dataset from Nordpool.');
-                        this.#dataBaseObject.saveSpotData(dataArray);
-                        this.#spotData.tomorrow = dataArray;
-                        this.#spotPriceUpdateTimer(this.countTimeDifferenceToUpdate(new Date()));
-                    }
-                    this.#firstRun =false;
-
-                }catch(error){
-                    console.log(error);
-                }  
-            }
-        }
-        else {
-            // start timer 
-            this.#spotPriceUpdateTimer(
-                this.countTimeDifferenceToUpdate(new Date())
-            );
-
-            // start today data fetching
-            if(this.#firstRun) this.#updateTodaysData();
-
-            this.#firstRun = false;
-        }
+        this.#updateTomorrowsData();
 
     }
 
@@ -124,6 +79,67 @@ class SpotPrice{
         }, countdownMilliseconds);
     }
 
+    async #updateTomorrowsData(){
+
+        if (this.#checkIsTimeTodayAfer()){
+            if(this.#firstRun){
+                try{
+                    let tomorrow = new Date();
+                    tomorrow.setHours(0,0,0,0);
+                    tomorrow.setTime(tomorrow.valueOf()+90000000);
+                    let firstValue = this.#epochSeconds(tomorrow);
+                    tomorrow.setHours(23,0,0,0);
+                    tomorrow.setTime(tomorrow.valueOf()+3600000);
+                    let lastValue = this.#epochSeconds(tomorrow);
+
+                    const data = await this.#dataBaseObject.getSpotData([firstValue,lastValue]);
+
+                    if(data.length > 22 && data.length < 26){
+                        this.#spotData.tomorrow = data;
+                    }
+                    else if(data.length > 0 && data.length < 23 || data.length > 25) {
+                        throw new Error(
+                        'spot data probably corrupted, check data for ' + tomorrow.toISOString());
+                    }
+                    if (data.length === 0) {
+                        let spotData = await this.#fetchDataFromNordPool();
+                        const dataArray = extractData(spotData);
+                        if(dataArray.length === 0) throw new Error ('Empty tomorrow dataset from Nordpool.');
+                        this.#dataBaseObject.saveSpotData(dataArray);
+                        this.#spotData.tomorrow = dataArray;  
+                    }    
+
+                }catch(error){
+                    console.log(error);
+                }   
+            }
+            else {
+                let spotData = await this.#fetchDataFromNordPool();
+                const dataArray = extractData(spotData);
+                if(dataArray.length === 0) throw new Error ('Empty tomorrow dataset from Nordpool.');
+                this.#dataBaseObject.saveSpotData(dataArray);
+                this.#spotData.tomorrow = dataArray;
+            }
+
+            setTimeout(()=>{
+                this.#updateTomorrowsData();
+            }, this.countTimeDifferenceToUpdate(new Date())); 
+
+        }
+        else {
+
+            setTimeout(()=>{
+                this.#updateTomorrowsData();
+            }, this.countTimeDifferenceToUpdate(new Date()));
+                
+        }
+
+        if(this.#firstRun) {
+            this.#firstRun = false;
+            this.#updateTodaysData();
+        }
+    }
+
     //TODO
     #updateTodaysData(){}
 
@@ -131,6 +147,10 @@ class SpotPrice{
         let response = await fetch('https://www.nordpoolgroup.com/api/marketdata/page/35?currency=EUR');
         let spotData = await response.json();
         return spotData;
+    }
+
+    #epochSeconds(dateTime){
+        return Math.floor(dateTime.valueOf()/1000);
     }
 
 }
