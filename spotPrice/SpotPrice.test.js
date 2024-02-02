@@ -57,8 +57,16 @@ test('Invalid time paramters raises error',()=>{
 
 test('Time difference', ()=>{
 
-    const timeBefore = new Date('2024-01-28T13:44:00');
-    const timeForUpdate = [11,45];
+    const checkTime = require('./CheckTime.js');
+    let mockDateTime = require('mockdate');
+
+/* Winter time (normal time) */
+
+    // 28th January 2024 UTC 11:44 (13:44 EET)
+    mockDateTime.set(1706442240000);
+
+    let timeBefore = new Date('2024-01-28T13:44:00');
+    let timeForUpdate = [11,45];
     const spotPrice = new SpotPrice(timeForUpdate);
     let timediff1 = spotPrice.countTimeDifferenceToUpdate(timeBefore);
     expect(timediff1).toEqual(60000);
@@ -74,4 +82,27 @@ test('Time difference', ()=>{
     timeInThereshold = new Date('2024-01-28T13:45:04.999');
     let timeDiff4 = spotPrice.countTimeDifferenceToUpdate(timeInThereshold);
     expect(timeDiff4).toEqual(10000);
+
+/* Summer time (daylight saving) */
+
+    // 28th April 2024 UTC 11:44 (13:44 EET)
+    mockDateTime.set(1714301040000);
+
+    timeBefore = new Date('2024-04-28T14:44:00');
+    timediff1 = spotPrice.countTimeDifferenceToUpdate(timeBefore);
+    expect(timediff1).toEqual(60000);
+
+    timeAfter = new Date('2024-04-28T14:46');
+    timediff2 = spotPrice.countTimeDifferenceToUpdate(timeAfter);
+    expect(timediff2).toEqual(86340000);
+
+    timeExact = new Date('2024-04-28T14:45');
+    timediff3 = spotPrice.countTimeDifferenceToUpdate(timeExact);
+    expect(timediff3).toEqual(0);
+
+    timeInThereshold = new Date('2024-04-28T14:45:04.999');
+    timeDiff4 = spotPrice.countTimeDifferenceToUpdate(timeInThereshold);
+    expect(timeDiff4).toEqual(10000);
+
+    mockDateTime.reset();
 });
