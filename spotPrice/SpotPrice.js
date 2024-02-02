@@ -141,7 +141,25 @@ class SpotPrice{
     }
 
     //TODO
-    #updateTodaysData(){}
+    async #updateTodaysData(){
+
+        if(this.#spotData.today === undefined){
+            let today = new Date();
+            today.setHours(1,0,0,0);
+            let startTime = this.#epochSeconds(today);
+            today.setTime(today.valueOf() + 82800000)
+            let endTime = this.#epochSeconds(today);
+
+            const todayData = this.#dataBaseObject.getSpotData([startTime, endTime]);
+            if (todayData.length < 23) throw new Error ('Today spot data incomplete. ' + new Date().setTime(startTime).toISOString());
+            this.#spotData.today = todayData;
+
+            if (todayData === 0){
+                
+            }
+        }
+        
+    }
 
     async #fetchDataFromNordPool(){
         let response = await fetch('https://www.nordpoolgroup.com/api/marketdata/page/35?currency=EUR');
