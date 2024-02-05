@@ -1,4 +1,5 @@
 const {Db} = require('./../dataBase/Db');
+const { getMonthWithLeadZero, getLastSunday } = require('./DateTimeFunctions');
 const {extractData} = require('./ExtractData');
 let instance;
 
@@ -73,12 +74,6 @@ class SpotPrice{
         return timeDiff;
     }
 
-    #spotPriceUpdateTimer(countdownMilliseconds){
-        setTimeout(()=>{
-            this.startService();
-        }, countdownMilliseconds);
-    }
-
     async #updateTomorrowsData(){
 
         if (this.#checkIsTimeTodayAfer()){
@@ -106,7 +101,7 @@ class SpotPrice{
                         const dataArray = extractData(spotData);
                         if(dataArray.length === 0) throw new Error ('Empty tomorrow dataset from Nordpool.');
                         this.#dataBaseObject.saveSpotData(dataArray);
-                        this.#spotData.tomorrow = dataArray;  
+                        this.#spotData.tomorrow = this.#spotDataArrayToObjArray(dataArray); 
                     }    
 
                 }catch(error){
@@ -118,7 +113,7 @@ class SpotPrice{
                 const dataArray = extractData(spotData);
                 if(dataArray.length === 0) throw new Error ('Empty tomorrow dataset from Nordpool.');
                 this.#dataBaseObject.saveSpotData(dataArray);
-                this.#spotData.tomorrow = dataArray;
+                this.#spotData.tomorrow = this.#spotDataArrayToObjArray(dataArray);
             }
 
             setTimeout(()=>{
@@ -143,22 +138,44 @@ class SpotPrice{
     //TODO
     async #updateTodaysData(){
 
-        if(this.#spotData.today === undefined){
-            let today = new Date();
-            today.setHours(1,0,0,0);
-            let startTime = this.#epochSeconds(today);
-            today.setTime(today.valueOf() + 82800000)
-            let endTime = this.#epochSeconds(today);
+        let today = new Date();
+        today.setHours(1,0,0,0);
+        const startTimeMilliseconds = today.valueOf();
+        const startTime = this.#epochSeconds(today);
+        today.setTime(today.valueOf() + 82800000)
+        const endTime = this.#epochSeconds(today);
 
-            const todayData = this.#dataBaseObject.getSpotData([startTime, endTime]);
-            if (todayData.length < 23) throw new Error ('Today spot data incomplete. ' + new Date().setTime(startTime).toISOString());
-            this.#spotData.today = todayData;
+        if(this.#spotData.today === undefined){
+            
+            const todayData = await this.#dataBaseObject.getSpotData([startTime, endTime]);
+            if (todayData.length < 23) throw new Error ('Today spot data incomplete.');
+            this.#spotData.today = todayData; 
 
             if (todayData === 0){
-                
+
+                const dataFromNordPool = await this.#fetchDataFromNordPool();
+                // TODO: spotDataColumnByDate to find today data
+
             }
+
         }
-        
+        else{
+
+            if (startTime !== this.#spotData.tomorrow[0]) { 
+                console.log ('Today data not found in tomorrow data.');
+            }
+
+            this.#spotData.today = [...this.#spotData.tomorrow];
+            this.#spotData.tomorrow = undefined;
+
+        }
+
+        // 24h + 1 minute (86400000 + 60000)
+        const timeDiff = (startTimeMilliseconds + 86460000) - new Date().valueOf();
+        setTimeout(()=>{
+            this.#updateTodaysData();
+        }, timeDiff);
+
     }
 
     async #fetchDataFromNordPool(){
@@ -167,8 +184,76 @@ class SpotPrice{
         return spotData;
     }
 
+    #spotDataColumnByDate(day, data){
+        if (!(day instanceof Date)) throw new Error ('Given parameter not a Date object');
+        const nameString = day.getDate() +'-'+ getMonthWithLeadZero(day) +'-'+ day.getFullYear();
+        const columnIndex = data.data.Rows[0].Columns.findIndex((element) => element.Name == nameString);
+        if(columnIndex > -1){
+            const daylightSaving = new Date(day).setUTCHours(0,0,0,0) === getLastSunday(day.getFullYear(), 10).setUTCHours(0,0,0,0);
+            let daylightCounter = 0;
+            const resultArray = [];
+            const colIndex = data.data.Rows[0].Columns[columnIndex].Index;
+            for (let r=0; r < data.data.Rows.length; r++){
+
+                let columnObject;
+
+                if (data.data.Rows[r].Name.search(/^\d\d/) > -1){
+                    columnObject = data.data.Rows[r].Columns.find(element => element.Name == nameString
+                        && element.Index == colIndex);
+                }
+                
+                if (columnObject) {
+
+                    
+                    let start = data.data.Rows[r].StartTime.split('T')[1].split(':');
+                    let end = data.data.Rows[r].EndTime.split('T')[1].split(':');
+                    if(daylightSaving && start[0] == 2) daylightCounter++; 
+
+                    let timeDiff = (end[0]-start[0] < 0 ? 24+(end[0]-start[0]) : end[0]-start[0])*3600000 + (end[1]-start[1])*60000 + (end[2]-start[2])*1000;
+
+                    let todayStart = new Date(
+                        day.getFullYear(), day.getMonth(), day.getDate(),
+                        parseInt(start[0])+1, parseInt(start[1]), parseInt(start[2])
+                        );
+
+                    if (daylightCounter == 2) {
+                        todayStart.setUTCHours(1);
+                        daylightCounter = 3;
+                    }
+
+                    let todayEnd = new Date(todayStart.valueOf()+timeDiff);
+
+                    let object = {
+                        startTime: todayStart,
+                        endTime: todayEnd,
+                        price: parseFloat(columnObject.Value.replace(',', '.')),
+                        priceArea: 'FI'
+                    }
+                    if (isNaN(object.price)) continue;
+                    resultArray.push(object);
+                }
+            }
+            return resultArray;
+        }
+        return [];
+    }
+
     #epochSeconds(dateTime){
         return Math.floor(dateTime.valueOf()/1000);
+    }
+
+    #spotDataArrayToObjArray(dataArray){
+        const objectArray = [];
+        for (let i = 0; i < dataArray.length; i+=3){
+            let object = {
+                startTime:  dataArray[i],
+                endTime:    dataArray[i+1],
+                price:      dataArray[i+2],
+                priceArea:  'FI'
+            }
+            objectArray.push(object);
+        }
+        return objectArray;
     }
 
 }

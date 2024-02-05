@@ -1,3 +1,4 @@
+
 beforeEach(()=>{
     return { SpotPrice } = require("./SpotPrice");
 });
