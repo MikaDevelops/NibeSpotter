@@ -74,6 +74,10 @@ class Db{
         }
     }
 
+    /**
+     * Saves extracted spot price data to database.
+     * @param {Array} data in array. Structure [startTime,endTime, price].
+     */
     saveSpotData(data){
         if (data.length > 100) {
             throw new Error ('spot data too long');
@@ -136,26 +140,6 @@ class Db{
         
     }
 
-    /**
-     * Loads last 24 entries from spot price table.
-     * @returns {Array<object>} Array of row objects.
-     */
-    getLatest24h(){
-        return new Promise((resolve, reject)=>{
-            let sqlString =
-            `SELECT ${this.#spotDataModel.idField},${this.#spotDataModel.dataFields[0]},
-            ${this.#spotDataModel.dataFields[1]},${this.#spotDataModel.dataFields[2]}
-            FROM ${this.#spotDataModel.tableName} ORDER BY ${this.#spotDataModel.idField} DESC LIMIT 24;`;
-
-            const db = this.#openDatabase();
-            db.all(sqlString, [], (error, rows)=>{
-                if (error) reject (error);
-                resolve(rows);
-            });
-            this.#closeDataBase(db);
-        });
-    }
-
     #openDatabase(){
         const sqlite = require('sqlite3').verbose();
         const dataBase = new sqlite.Database(this.#dataBaseAddress, (error) => {
@@ -173,8 +157,8 @@ class Db{
         newDB.exec(`
         CREATE TABLE IF NOT EXISTS spotPrice
         (
-            startTime DATETIME NOT NULL,
-            endTime DATETIME NOT NULL,
+            startTime BIGINT NOT NULL,
+            endTime BIGINT NOT NULL,
             price FLOAT NOT NULL,
             priceArea VARCHAR(50) NOT NULL,
             PRIMARY KEY (startTime)
