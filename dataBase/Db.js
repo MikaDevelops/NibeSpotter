@@ -79,7 +79,7 @@ class Db{
      * @param {Array} data in array. Structure [startTime,endTime, price].
      */
     saveSpotData(data){
-        if (data.length > 100) {
+        if (data.length > 25) {
             throw new Error ('spot data too long');
         }else{
             const sqlString = this.#makeSqlInsertString(data);
@@ -216,15 +216,20 @@ class Db{
         `);
     }
 
+    /**
+     * Makes insert string to be used in query.
+     * @param {object[]} data array of spot price objects.
+     * @returns {string} sql string
+     */
     #makeSqlInsertString(data){
 
         let valuesString = '';
 
-        for(let i=0; i < data.length; i+=3){
-            let startTimeUnix = Math.floor(new Date(data[i]).valueOf() / 1000);
-            let endTimeUnix = Math.floor(new Date(data[i+1]).valueOf() / 1000);
-            valuesString += `('${startTimeUnix}','${endTimeUnix}','${data[i+2]}','FI')`;
-            if(i < data.length-3) valuesString += ',';
+        for(let i=0; i < data.length; i++){
+            let startTimeUnix = Math.floor(new Date(data[i].startTime).valueOf() / 1000);
+            let endTimeUnix = Math.floor(new Date(data[i].endTime).valueOf() / 1000);
+            valuesString += `('${startTimeUnix}','${endTimeUnix}','${data[i].price}','${data[i].priceArea}')`;
+            if(i < data.length-1) valuesString += ',';
         }
 
         let insertString = `INSERT INTO ${this.#spotDataModel.tableName}(

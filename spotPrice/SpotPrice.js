@@ -101,7 +101,7 @@ class SpotPrice{
                         const dataArray = extractData(spotData);
                         if(dataArray.length === 0) throw new Error ('Empty tomorrow dataset from Nordpool.');
                         this.#dataBaseObject.saveSpotData(dataArray);
-                        this.#spotData.tomorrow = this.#spotDataArrayToObjArray(dataArray); 
+                        this.#spotData.tomorrow = [...dataArray]; 
                     }    
 
                 }catch(error){
@@ -113,7 +113,7 @@ class SpotPrice{
                 const dataArray = extractData(spotData);
                 if(dataArray.length === 0) throw new Error ('Empty tomorrow dataset from Nordpool.');
                 this.#dataBaseObject.saveSpotData(dataArray);
-                this.#spotData.tomorrow = this.#spotDataArrayToObjArray(dataArray);
+                this.#spotData.tomorrow = [...dataArray];
             }
 
             setTimeout(()=>{
