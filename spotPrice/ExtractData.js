@@ -1,5 +1,10 @@
 const { getLastSunday, getTomorrow, getMonthWithLeadZero, isSummertime } = require("./DateTimeFunctions.js");
 
+/**
+ * 
+ * @param {object} json 
+ * @returns {Array.<object>}
+ */
 function extractData(json){
 
     const currentDate = new Date();
@@ -65,17 +70,26 @@ function extractData(json){
         nordPoolDateTimeStart = new Date( json.data.Rows[rowIndex].StartTime + timezoneOffsetNordPool );
         nordPoolDateTimeEnd = new Date( json.data.Rows[rowIndex].EndTime + timezoneOffsetNordPool );
 
-        priceData.push( nordPoolDateTimeStart.toISOString() );
-        priceData.push( nordPoolDateTimeEnd.toISOString()  );
-        priceData.push( json.data.Rows[rowIndex].Columns[columnIndex].Value.replace(",", ".") );
+        let priceObject = {
+            startTime:  nordPoolDateTimeStart.toISOString(),
+            endTime:    nordPoolDateTimeEnd.toISOString(),
+            price:      json.data.Rows[rowIndex].Columns[columnIndex].Value.replace(",", "."),
+            priceArea:  'FI'
+        };
+
+        priceData.push(priceObject);
 
         // if it is last sunday of October and time is 02:00 we get the exra row.
         if (i == 2 && json.data.Rows[ rowIndex + 1 ].StartTime == dateTimeString){
             let nordPoolDateTimeStartExtra = ( new Date( json.data.Rows[rowIndex + 1 ].StartTime + "+01:00" ) );
             let nordPoolDateTimeEndExtra = new Date( json.data.Rows[rowIndex + 1 ].EndTime + "+01:00" );
-            priceData.push( nordPoolDateTimeStartExtra.toISOString() );
-            priceData.push( nordPoolDateTimeEndExtra.toISOString() );
-            priceData.push( json.data.Rows[rowIndex + 1].Columns[columnIndex].Value.replace(",", ".") );
+            let extraObject={
+                startTime:  nordPoolDateTimeStartExtra.toISOString(),
+                endTime:    nordPoolDateTimeEndExtra.toISOString(),
+                price:      json.data.Rows[rowIndex + 1].Columns[columnIndex].Value.replace(",", "."),
+                priceArea:  'FI'
+            }
+            priceData.push(extraObject)
         }
             
     }
