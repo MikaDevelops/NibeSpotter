@@ -76,7 +76,7 @@ class Db{
 
     /**
      * Saves extracted spot price data to database.
-     * @param {Array} data in array. Structure [startTime,endTime, price].
+     * @param {object[]} data in array. Structure [{startTime,endTime,price,priceArea}].
      */
     saveSpotData(data){
         if (data.length > 25) {
