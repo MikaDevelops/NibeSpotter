@@ -148,10 +148,10 @@ class SpotPrice{
         if(this.#spotData.today === undefined){
             
             const todayData = await this.#dataBaseObject.getSpotData([startTime, endTime]);
-            if (todayData.length < 23) throw new Error ('Today spot data incomplete.');
+            if (todayData.length < 23) console.log ('Today spot data incomplete.');
             this.#spotData.today = todayData; 
 
-            if (todayData === 0){
+            if (todayData.length === 0){
 
                 const dataFromNordPool = await this.#fetchDataFromNordPool();
                 // TODO: spotDataColumnByDate to find today data
