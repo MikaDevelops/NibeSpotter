@@ -10,6 +10,7 @@ Concurrently used to start both servers with `npm start`
 
 ## Project status
 
+- [ ] new source for spot data (Nordpool change 2024)
 - [x] extracting data from Json
 - [x] saving extracted data to database
 - [x] authentication to Nibeuplink-service
