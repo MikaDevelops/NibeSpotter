@@ -1,4 +1,3 @@
-
 beforeEach(()=>{
     return { SpotPrice } = require("./SpotPrice");
 });
@@ -104,6 +103,6 @@ test('Time difference', ()=>{
     timeInThereshold = new Date('2024-04-28T14:45:04.999');
     timeDiff4 = spotPrice.countTimeDifferenceToUpdate(timeInThereshold);
     expect(timeDiff4).toEqual(10000);
-
+    spotPrice.stopService();
     mockDateTime.reset();
 });

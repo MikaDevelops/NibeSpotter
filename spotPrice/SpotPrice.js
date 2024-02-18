@@ -13,10 +13,12 @@ class SpotPrice{
         today: undefined,
         tomorrow: undefined
     };
+    #tomorrowSetTimeoutID = undefined;
+    #todaySetTimeoutID = undefined;
 
     /**
      * 
-     * @param {Array<number>} timeOfSpotPriceUpdate give time as an array of two integers [hours, minutes] example [13,45] is 13:45.
+     * @param {Array<number>} timeOfSpotPriceUpdate give time as an array of two integers [hours, minutes] example [13,45] is 13:45 UTC.
      * @param {Db} dataBaseObject
      */
     constructor(timeOfSpotPriceUpdate, dataBaseObject){
@@ -27,10 +29,20 @@ class SpotPrice{
         instance = this;
     }
 
+    /**
+     * Starts timeouts and loads data to variable.
+     */
     async startService(){
-
         this.#updateTomorrowsData();
+    }
 
+    /**
+     * Clears update timouts and sets instance variable to undefined.
+     */
+    stopService(){
+        instance = undefined;
+        if (this.#tomorrowSetTimeoutID) clearTimeout(this.#tomorrowSetTimeoutID);
+        if (this.#todaySetTimeoutID) clearTimeout(this.#todaySetTimeoutID);
     }
 
     #validateTimeFormat(time){
@@ -116,14 +128,14 @@ class SpotPrice{
                 this.#spotData.tomorrow = [...dataArray];
             }
 
-            setTimeout(()=>{
+            this.#tomorrowSetTimeoutID = setTimeout(()=>{
                 this.#updateTomorrowsData();
             }, this.countTimeDifferenceToUpdate(new Date())); 
 
         }
         else {
 
-            setTimeout(()=>{
+            this.#tomorrowSetTimeoutID = setTimeout(()=>{
                 this.#updateTomorrowsData();
             }, this.countTimeDifferenceToUpdate(new Date()));
                 
@@ -148,20 +160,22 @@ class SpotPrice{
         if(this.#spotData.today === undefined){
             
             const todayData = await this.#dataBaseObject.getSpotData([startTime, endTime]);
-            if (todayData.length < 23) console.log ('Today spot data incomplete.');
+            if (todayData.length < 23) console.log ('Today spot data from database incomplete.');
             this.#spotData.today = todayData; 
 
             if (todayData.length === 0){
-
                 const dataFromNordPool = await this.#fetchDataFromNordPool();
                 // TODO: spotDataColumnByDate to find today data
-
+                const todayDataFromNP = this.#spotDataColumnByDate(new Date(), dataFromNordPool);
+                if (todayDataFromNP.length === 0) console.log('Today spot data not found in Nord Pool response.');
+                this.#spotData.today = todayDataFromNP;
+                this.#dataBaseObject.saveSpotData(todayDataFromNP);
             }
 
         }
         else{
 
-            if (startTime !== this.#spotData.tomorrow[0]) { 
+            if (!this.#spotData.tomorrow.find(element => element.startTime === startTime)) { 
                 console.log ('Today data not found in tomorrow data.');
             }
 
@@ -172,7 +186,7 @@ class SpotPrice{
 
         // 24h + 1 minute (86400000 + 60000)
         const timeDiff = (startTimeMilliseconds + 86460000) - new Date().valueOf();
-        setTimeout(()=>{
+        this.#todaySetTimeoutID = setTimeout(()=>{
             this.#updateTodaysData();
         }, timeDiff);
 
