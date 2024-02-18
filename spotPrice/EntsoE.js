@@ -20,9 +20,12 @@ class EntsoE{
 
         if (!(startTime instanceof Date) || !(endTime instanceof Date)) throw new Error('Given time parameter not Date object.');
 
+        const startString   = this.makePeriodString(startTime);
+        const endString     = this.makePeriodString(endTime);
+
         const response = await fetch('https://web-api.tp.entsoe.eu/api?documentType=A44&in_Domain=10YFI-1--------U'
-                + `&out_Domain=10YFI-1--------U&periodStart=${startTime}`
-                + `&periodEnd=${endTime}&securityToken=${this.#token}`);
+                + `&out_Domain=10YFI-1--------U&periodStart=${startString}`
+                + `&periodEnd=${endString}&securityToken=${this.#token}`);
 
         const stringRes = await response.text();
         let dataObject;
@@ -36,7 +39,7 @@ class EntsoE{
     }
 
     /**
-     * 
+     * Makes string using Date-object.
      * @param {Date} datetime 
      * @returns {string} 'YYYYmmddhhmm'
      */
@@ -52,8 +55,13 @@ class EntsoE{
               + day
               + hour
               + minute;
-              
+
         return dateTimeString;
+    }
+
+    extractPriceData(dataObject){
+
+        return null;
     }
 }
 
