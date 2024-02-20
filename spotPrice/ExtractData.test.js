@@ -1,8 +1,23 @@
-const {extractData} = require('./ExtractData.js');
-const {mockData} = require('./__mocks__/mockData.js');
-const {mockDataDayLightMarch} = require('./__mocks__/mockDataDayLightMarch.js');
-const {mockDataDayLightOctober} = require('./__mocks__/mockDataDayLightOct.js');
+const {extractData} =               require('./ExtractData.js');
+const {mockData} =                  require('./__mocks__/mockData.js');
+const {mockData2} =                 require('./__mocks__/mockData2.js');
+const {mockDataDayLightMarch} =     require('./__mocks__/mockDataDayLightMarch.js');
+const {mockDataDayLightOctober} =   require('./__mocks__/mockDataDayLightOct.js');
 
+test('extract data test 01 January 2024 15:00 EET', ()=>{
+    let MockDate = require('mockdate');
+    // 1st January 2024
+    MockDate.set(1704027600000);
+
+    let expectedData = [
+        {startTime:"2023-12-31T23:00:00.000Z",endTime:"2024-01-01T00:00:00.000Z",price:"19.88",priceArea:"FI"},
+        {startTime:"2024-01-01T00:00:00.000Z",endTime:"2024-01-01T01:00:00.000Z",price:"5.55",priceArea:"FI"}
+    ]
+
+    expect(extractData(mockData2)).toEqual(expectedData);
+
+    MockDate.reset();
+});
 
 test('extract data test 11th January 2023 15:00 EET', ()=> {
 
