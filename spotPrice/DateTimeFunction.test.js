@@ -69,7 +69,7 @@ test('DateTimeFunction isSummerTime test', ()=>{
         '2023-03-26T02:this should not stop function from working',
         '2023-03-29T02:59:59',
         '2023-03-29T03:00:00',
-
+        '2023-01-01T03:00:00'
 
     ];
 
@@ -79,7 +79,8 @@ test('DateTimeFunction isSummerTime test', ()=>{
         true,
         true,
         false,
-
+        false,
+        
     ];
 
     expect(isSummertime(testData[0])).toBe(expectedData[0]);
