@@ -99,10 +99,10 @@ class SpotPrice{
                     let tomorrow = new Date();
                     tomorrow.setHours(0,0,0,0);
                     tomorrow.setTime(tomorrow.valueOf()+90000000);
-                    let firstValue = this.#epochSeconds(tomorrow);
+                    const firstValue = this.#epochSeconds(tomorrow);
                     tomorrow.setHours(23,0,0,0);
                     tomorrow.setTime(tomorrow.valueOf()+3600000);
-                    let lastValue = this.#epochSeconds(tomorrow);
+                    const lastValue = this.#epochSeconds(tomorrow);
 
                     const data = await this.#dataBaseObject.getSpotData([firstValue,lastValue]);
 
@@ -114,7 +114,7 @@ class SpotPrice{
                         'spot data probably corrupted, check data for ' + tomorrow.toISOString());
                     }
                     if (data.length === 0) {
-                        let spotData = await this.#fetchDataFromNordPool();
+                        let spotData = await this.#fetchDataFromNordPool([firstValue,lastValue]);
                         const dataArray = extractData(spotData);
                         if(dataArray.length === 0) throw new Error ('Empty tomorrow dataset from Nordpool.');
                         this.#dataBaseObject.saveSpotData(dataArray);
@@ -126,7 +126,9 @@ class SpotPrice{
                 }   
             }
             else {
-                let spotData = await this.#fetchDataFromNordPool();
+                let spotData = await this.#fetchDataFromNordPool([firstValue,lastValue]);
+
+                // TODO: should be used in fetchDataFromNordPool
                 const dataArray = extractData(spotData);
                 if(dataArray.length === 0) throw new Error ('Empty tomorrow dataset from Nordpool.');
                 this.#dataBaseObject.saveSpotData(dataArray);
@@ -197,7 +199,7 @@ class SpotPrice{
 
     }
 
-    async #fetchDataFromNordPool(){
+    async #fetchDataFromNordPool(startAndEnd){
         let response = await fetch('https://www.nordpoolgroup.com/api/marketdata/page/35?currency=EUR');
         let spotData = await response.json();
         return spotData;
