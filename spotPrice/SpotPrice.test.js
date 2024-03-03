@@ -2,6 +2,10 @@ beforeEach(()=>{
     return { SpotPrice } = require("./SpotPrice");
 });
 
+afterEach(()=>{
+    spotPrice = null;
+});
+
 test('Time of update not exactly 2 parameter raises error', ()=>{
 
     expect(()=>{
