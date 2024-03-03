@@ -1,5 +1,6 @@
 const {Db} = require('./../dataBase/Db');
 const { getMonthWithLeadZero, getLastSunday } = require('./DateTimeFunctions');
+const { EntsoE } = require('./EntsoE');
 const {extractData} = require('./ExtractData');
 let instance;
 
@@ -15,24 +16,28 @@ class SpotPrice{
     };
     #tomorrowSetTimeoutID = undefined;
     #todaySetTimeoutID = undefined;
+    #entsoE = undefined;
 
     /**
      * 
      * @param {Array<number>} timeOfSpotPriceUpdate give time as an array of two integers [hours, minutes] example [13,45] is 13:45 UTC.
      * @param {Db} dataBaseObject
+     * @param {(EntsoE|undefined)} entsoE optional Entso-E object.
      */
-    constructor(timeOfSpotPriceUpdate, dataBaseObject){
+    constructor(timeOfSpotPriceUpdate, dataBaseObject, entsoE){
         if(instance) throw new Error('Only one SpotPrice instance can be created');
         this.#validateTimeFormat(timeOfSpotPriceUpdate);
         this.#timeOfSpotPriceUdpate=timeOfSpotPriceUpdate;
         this.#dataBaseObject = dataBaseObject;
         instance = this;
+        if(entsoE) this.#entsoE = entsoE;
     }
 
     /**
      * Starts timeouts and loads data to variable.
      */
     async startService(){
+        if(this.#entsoE) console.log("Using Entso-E transparency API for spot-price data.");
         this.#updateTomorrowsData();
     }
 
